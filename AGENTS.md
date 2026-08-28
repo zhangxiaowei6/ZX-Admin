@@ -187,23 +187,24 @@ Query Key 统一由 `src/hooks/query/keys.ts` 的工厂生成，不在页面中�
 
 ```tsx
 useQuery({
-  queryKey: queryKeys.users.list(params),
+  queryKey: queryKeys.system.users(params),
   queryFn: fetchUsers,
 })
 
-queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+queryClient.invalidateQueries({ queryKey: queryKeys.system.users(params) })
 ```
 
 常用键：
 
-- `queryKeys.users.all`
-- `queryKeys.users.list(params)`
-- `queryKeys.users.detail(id)`
-- `queryKeys.dictionary.type(dictType)`
+- `queryKeys.system.allRoles`
+- `queryKeys.system.users(params)`
+- `queryKeys.platform.tenants(params)`
+- `queryKeys.tenant.products(params)`
+- `queryKeys.system.dictItems(dictType)`
 
 常用 Hooks：
 
-- `useCommon()`：分页与搜索参数。
+- `usePagination()` / `useSearchParams()`：手动分页与搜索参数；`ProTable request` 模式无需重复使用。
 - `useDictionary(dictType)`：字典数据，默认缓存 30 分钟。
 - `useFormModal()`：表单弹层和编辑 ID。
 - `usePermission()`：权限判断。

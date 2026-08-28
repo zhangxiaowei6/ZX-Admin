@@ -174,8 +174,8 @@ In Mock mode, ensure `VITE_API_BASE_URL` is empty and use `admin` / `zx@123`. Fo
 Click the ⚙️ icon in the top-right corner. All settings persist automatically in `localStorage`.
 
 **How to add a new menu?**
-- Platform menu: edit `src/constants/menu/platformMenu.tsx`
-- Tenant menu: edit `src/constants/menu/tenantMenu.tsx`
+- Platform routes and menu: edit `src/config/routes/platform.config.tsx`
+- Tenant routes and menu: edit `src/config/routes/tenant.config.tsx`
 
 **How to resolve CORS issues?**
 In development, configure a proxy in `vite.config.ts`. In production, use Nginx reverse proxy or configure CORS on the backend.
@@ -189,12 +189,13 @@ Set `VITE_CRYPTO_ENABLED=false`. Request signing cannot be disabled; to modify t
 
 Using "Notice Management" as an example:
 
-1. **Register route**: Add entry in `src/routes/modules/platform.tsx`
-2. **Add menu item**: Add entry in `src/constants/menu/platformMenu.tsx`
-3. **Create page**: Create `src/pages/Platform/Notice/index.tsx`
-4. **Define API**: Create `src/api/modules/platform/notice.ts`
-5. **Create hook** (optional): Create `src/pages/Platform/Notice/hooks/useNotice.ts`
-6. **Add mock**: Create `mock/platform/notice.ts` and import it in `mock/index.ts`
+1. **Configure routes and menu**: Add a unified entry in `src/config/routes/platform.config.tsx`
+2. **Create page**: Create `src/pages/Platform/Notice/index.tsx`
+3. **Define API**: Create `src/api/modules/platform/notice.ts` and call `src/api/request.ts`
+4. **Create hook** (optional): Create `src/pages/Platform/Notice/hooks/useNotice.ts`
+5. **Add types**: Add and export the domain types under `src/types/platform/`
+6. **Add mock**: Register a fixed route and response in `src/api/mock/index.ts`
+7. **Add translations**: Update the matching namespace in `zh-CN`, `en-US`, and `ja-JP`
 
 No framework code needs to be modified.
 

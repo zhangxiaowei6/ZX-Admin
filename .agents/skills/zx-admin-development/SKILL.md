@@ -1,70 +1,74 @@
 ---
 name: zx-admin-development
-description: 在 zx-admin 仓库中新增、修改、重构或审查 React/TypeScript 前端代码时使用，确保统一路由与权限、FormContainer、Zustand、React Query、i18n、API 和 Mock 等项目约定得到落实；不用于仓库外的通用前端任务。
+description: 在 zx-admin 仓库中新增、修改、重构或审查 React/TypeScript 前端代码时使用，确保统一路由与权限、FormContainer、Zustand、React Query、i18n、API 和静态 Mock 等项目约定得到落实；不用于仓库外的通用前端任务。
 ---
 
 # ZX Admin 开发规范
 
 ## 规范来源
 
-开始工作前完整阅读 [AGENTS.md](../../../AGENTS.md)。该文件是本仓库架构、编码约定和验证要求的唯一事实来源；本技能只提供执行检查清单，不复制整份项目手册。若本技能与 `AGENTS.md` 冲突，以 `AGENTS.md` 为准。
+开始工作前完整阅读 [AGENTS.md](../../../AGENTS.md)。它是本仓库架构、编码约定和验证要求的唯一事实来源；本技能负责把规范落实到具体改动，不复制整份项目手册。文档、历史代码或本技能与 `AGENTS.md` 冲突时，以 `AGENTS.md` 和当前实现共同确认的行为为准。
 
-## 工作方式
+需要核对 Query Key、页面范式、请求链路或已知遗留模式时，再读取 [references/current-patterns.md](references/current-patterns.md)。普通小改动不必加载该参考。
 
-1. 先判断改动属于平台后台、租户后台还是共享基础能力。
-2. 搜索相邻模块和现有组件、Hooks、Services、工具函数，沿用已经建立的模式。
-3. 选择满足需求的最轻实现，不为假设中的后续需求提前增加抽象。
-4. 保持改动聚焦，不顺带修复无关问题，不覆盖用户已有修改。
-5. 根据改动范围完成专项检查，再运行相称的验证命令。
+## 工作流程
 
-## 分层约束
+1. 判断改动属于平台后台、租户后台还是共享基础能力。
+2. 搜索相邻页面、组件、Hooks、Services、API 和类型，沿用当前领域已经建立的模式。
+3. 选择满足需求的最轻实现，不为未出现的需求提前增加抽象。
+4. 同步核对路由、权限、类型、API、Mock 和三语言资源，按实际影响修改。
+5. 保持改动聚焦，不覆盖用户已有修改，不顺带清理无关遗留问题。
 
-- 页面放在 `src/pages/Platform/` 或 `src/pages/Tenant/`。
-- API 定义放在 `src/api/modules/platform/` 或 `src/api/modules/tenant/`，统一通过 `src/api/request.ts` 调用。
-- 页面私有查询、Mutation 和交互状态优先放在页面 `hooks/`。
-- 跨页面通用 UI 放在 `src/components/common/`；布局能力放在 `src/components/layout/`。
-- 复杂且与 UI 无关的转换、过滤和树处理逻辑放在 `src/services/`。
-- 平台与租户的类型、API 和 Mock 保持领域分层，不把租户特有逻辑塞入共享层。
+## 路由、菜单与权限
 
-## 路由与权限
+- 路由和菜单统一来自 `src/config/routes/`。平台使用 `getPlatformRouteConfig()`，租户使用 `getTenantRouteConfig()`；不要恢复独立菜单常量。
+- `generateRoutes()` 生成 React Router 路由和 `handle.permission`；`generateMenuItems()` 生成菜单。隐藏菜单使用 `hideInMenu`，索引跳转使用 `redirectTo`。
+- 菜单名称由配置函数在运行时通过 i18n 生成；布局应在语言变化后重新生成菜单，不能缓存启动时的单语言文本。
+- 路由守卫读取匹配路由的 `handle.permission`。空 `permissions` 数组表示完全访问，不能改成无权限。
+- 菜单过滤、路由权限和页面操作权限使用同一语义。按钮和局部区域使用 `HasPermission` 或 `usePermission()`；权限数组采用 OR 语义。
+- 权限码使用后端实际下发值，不根据 URL 推断，不为统一格式擅自改名。
 
-- 路由和菜单统一维护在 `src/config/routes/platform.config.tsx` 或 `src/config/routes/tenant.config.tsx`，不要另建独立静态菜单配置。
-- 新增页面时同时配置组件、路径、i18n 名称、图标和准确的 `permission`；需要隐藏菜单时使用 `hideInMenu`。
-- 权限码使用后端实际下发值，不从 URL 推断，不擅自重命名既有权限码。
-- 页面路由权限与 `HasPermission` / `usePermission()` 使用的操作权限保持语义一致。
-- 保留“空权限数组表示完全访问”的兼容规则。
+## 页面、组件与状态
 
-## 组件、状态与数据
+- 页面放在对应的 `src/pages/Platform/` 或 `src/pages/Tenant/`；页面私有查询、Mutation 和交互逻辑优先放在页面 `hooks/`。
+- 业务表单弹窗或抽屉必须使用 `FormContainer`。尺寸、展示模式、列数和布局默认继承全局设置；字段级 `colProps` 可覆盖列宽。
+- 业务表格优先使用项目封装的 `ProTable` / `EditableProTable`，不要直接绕过导出、列宽和全局表格设置能力。
+- Zustand 单属性订阅使用选择器；多属性订阅使用 `useShallow`。新增代码不得直接调用整个 Store 后解构。
+- 跨页面 UI 放入 `src/components/common/`，布局能力放入 `src/components/layout/`；复杂且与 UI 无关的树转换、过滤和排序放入 `src/services/`。
 
-- 所有业务表单弹窗和抽屉使用 `FormContainer`，不要直接使用 `ModalForm` 或 `DrawerForm`。
-- 业务表格优先使用项目封装的 `ProTable` / `EditableProTable`。
-- `useAppStore` 多属性订阅必须配合 `useShallow`；单属性使用选择器，不直接订阅并解构整个 Store。
-- React Query 缓存键从 `src/hooks/query/keys.ts` 获取，不在页面中随意拼接 Query Key。
-- 优先复用 `useCommon`、`useDictionary`、`useFormModal`、`usePermission`、`usePolling` 和 `useVersionCheck`。
+## React Query
 
-## 文案与国际化
+- Query Key 统一从 `src/hooks/query/keys.ts` 获取，不手写数组。
+- `ProTable request` 已负责列表请求、分页和刷新，不再为同一列表额外包装 `useQuery`。
+- 独立引用数据、字典、仪表盘统计等适合 `useQuery`；CUD 使用 `useMutation`。简单 Mutation 可留在组件，成组或复用逻辑放在页面私有 Hook，沿用相邻模块模式。
+- 当前全局默认是 `refetchOnWindowFocus: false`、`retry: 1`、`staleTime: 0`。字典、角色、仪表盘等需要缓存的数据必须在查询处显式设置局部 `staleTime`。
 
-- 用户可见文本使用 i18n，不写死单一语言。
-- 新增或修改 key 时同步维护 `zh-CN`、`en-US`、`ja-JP` 三套同命名空间文件。
-- 路由与菜单名称通过现有动态配置函数获取翻译，确保切换语言后更新。
+## API、Mock 与认证
 
-## API、认证与 Mock
+- API 定义放在 `src/api/modules/platform/` 或 `src/api/modules/tenant/`，统一调用 `src/api/request.ts`；业务代码不得创建旁路 Axios 实例。
+- `VITE_API_BASE_URL` 为空时，请求层调用 `src/api/mock/` 的静态注册表；配置非空地址时走真实 Axios 链路。Mock 与真实接口共用方法、路径、参数、类型和响应结构。
+- Mock 使用固定响应，不维护跨请求状态，不使用随机数据或浏览器存储。
+- 普通业务请求的 401 由请求层清理状态、广播登出并跳转；预登录、平台登录、平台列表和平台切换的 401 由调用方处理。
+- 前端可见的 `VITE_APP_SECRET`、Token 和 localStorage 不是可信安全边界。不要提交真实密钥，也不要在业务代码中绕过现有签名、加密或认证链路。
 
-- 不绕过统一请求实例；保持签名、可选 AES 加密、Token 即时读取和 401 处理链路。
-- 登录流程接口的 401 由调用方处理，普通业务接口的 401 走全局登出流程。
-- 新增 Mock 时在 `src/api/mock/` 注册静态路径和固定响应，由 `src/api/request.ts` 根据 `VITE_API_BASE_URL` 统一切换。
-- Mock 与真实 API 共用路径、参数和响应结构，不维护状态、不使用随机数据或浏览器存储。
+## 国际化
 
-## 安全边界
+- 用户可见文本通过 i18n 提供，不新增单语言硬编码。
+- 新增或修改 key 时同步维护 `zh-CN`、`en-US`、`ja-JP` 对应命名空间文件。
+- 路由、菜单、表单提示、错误提示和按钮均遵守三语言同步要求。
 
-- 不提交真实密钥、Token、生产凭据或本地私有环境文件。
-- 调整请求签名、加密、认证、登出或跨标签页同步时，检查平台登录、平台切换、401 和多标签页行为。
-- 后端驱动路由只能使用前端白名单 `componentKey` 映射，禁止执行后端提供的动态导入路径。
+## 遗留模式
+
+当前少数文件仍有整 Store 订阅或手写 Query Key。这些是待渐进收敛的历史写法，不是示例：
+
+- 新代码不得复制。
+- 任务触及相关文件且能够局部修正时，改用选择器、`useShallow` 或统一 Query Key。
+- 不为完成当前任务而跨模块批量重构全部遗留代码。
 
 ## 完成检查
 
-- 检查路由、权限、API、类型、Mock 与三语言资源是否需要同步更新。
-- 检查是否复用了已有封装，是否把复杂逻辑放到合适层级。
-- 默认只运行 `npm run lint` 等静态检查。
+- 按改动范围核对路由、权限、API、类型、Mock、三语言资源和跨标签页行为。
+- 检查是否复用了已有封装，以及逻辑是否位于正确层级。
+- 默认运行 `npm run lint` 和必要的静态搜索。
 - 除非用户明确要求，否则不运行 `npm run build`、`npm run build:demo` 或其他编译、打包检查。
-- 本项目没有自动化测试命令；不要声称运行了不存在的测试。若验证受限，明确说明未执行的命令和原因。
+- 项目没有自动化测试命令；不要虚构测试结果。未执行的验证及原因应明确说明。

@@ -251,7 +251,7 @@ const { start, stop } = usePolling(fetchData, { immediate: false })
 
 - **ProTable `request` 模式不使用 `useQuery`**，其内部已处理分页/筛选/缓存
 - `useQuery` 用于**下拉选项、级联数据**等独立于表格的引用数据
-- **CUD 操作**统一使用 `useMutation`，`onSuccess` 中调用 `actionRef.current?.reload()` 刷新表格
+- **CUD 操作**统一使用 `useMutation`；简单操作可在页面内声明，成组或复用逻辑放入页面私有 Hook，成功后调用 `actionRef.current?.reload()` 或失效对应统一 Query Key
 
 ### queryKeys
 
@@ -264,10 +264,12 @@ import { queryKeys } from '@/hooks/query'
 queryKeys.system.allRoles        // ['system', 'roles', 'all']
 queryKeys.system.menus           // ['system', 'menus']
 queryKeys.platform.unreadCount   // ['platform', 'messages', 'unread']
+queryKeys.tenant.dashboardStats  // ['tenant', 'dashboard', 'stats']
 
 // 动态 key（带查询参数，参数变化自动触发重新请求）
 queryKeys.system.users({ pageNum: 1, status: 1 })
 queryKeys.platform.tenants({ name: 'test' })
+queryKeys.tenant.products({ pageNum: 1 })
 ```
 
 ### 业务查询 Hook 规范
@@ -304,7 +306,7 @@ import { useSystemRolesQuery } from '../hooks'
 
 ### useMutation 用法约定
 
-CUD 操作不封装为独立 Hook，直接在页面组件内声明，`onSuccess` 负责刷新表格和提示：
+简单 CUD 操作可以直接在页面组件内声明；成组或复用逻辑放入页面私有 Hook。两种方式都由 `onSuccess` 负责刷新表格、失效对应缓存和提示：
 
 ```tsx
 import { useMutation } from '@tanstack/react-query'

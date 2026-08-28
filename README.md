@@ -174,8 +174,8 @@ Mock 模式下确保 `VITE_API_BASE_URL` 为空，使用 `admin` / `zx@123`。�
 点击右上角 ⚙️ 图标，在设置抽屉中实时调整，所有配置自动保存到 `localStorage`。
 
 **如何添加新菜单？**
-- 平台菜单：编辑 `src/constants/menu/platformMenu.tsx`
-- 租户菜单：编辑 `src/constants/menu/tenantMenu.tsx`
+- 平台路由与菜单：编辑 `src/config/routes/platform.config.tsx`
+- 租户路由与菜单：编辑 `src/config/routes/tenant.config.tsx`
 
 **跨域问题如何解决？**
 开发环境在 `vite.config.ts` 中配置代理，生产环境通过 Nginx 反向代理或后端配置 CORS。
@@ -189,12 +189,13 @@ Mock 模式下确保 `VITE_API_BASE_URL` 为空，使用 `admin` / `zx@123`。�
 
 以「公告管理」为例，完整流程如下：
 
-1. **注册路由**：在 `src/routes/modules/platform.tsx` 添加路由
-2. **添加菜单**：在 `src/constants/menu/platformMenu.tsx` 添加菜单项
-3. **编写页面**：新建 `src/pages/Platform/Notice/index.tsx`
-4. **定义 API**：新建 `src/api/modules/platform/notice.ts`
-5. **编写 Hook**（可选）：新建 `src/pages/Platform/Notice/hooks/useNotice.ts`
-6. **添加 Mock**：新建 `mock/platform/notice.ts` 并在 `mock/index.ts` 中导入
+1. **配置路由和菜单**：在 `src/config/routes/platform.config.tsx` 添加统一配置
+2. **编写页面**：新建 `src/pages/Platform/Notice/index.tsx`
+3. **定义 API**：新建 `src/api/modules/platform/notice.ts`，统一调用 `src/api/request.ts`
+4. **编写 Hook**（可选）：新建 `src/pages/Platform/Notice/hooks/useNotice.ts`
+5. **添加类型**：在 `src/types/platform/` 增加并导出对应类型
+6. **添加 Mock**：在 `src/api/mock/index.ts` 注册固定路径和响应
+7. **补充国际化**：同步维护 `zh-CN`、`en-US`、`ja-JP` 对应命名空间
 
 无需修改任何框架代码。
 

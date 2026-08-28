@@ -60,7 +60,7 @@ BaseLayout 采用"模板方法"模式，定义了布局的骨架结构，具体�
 
 ### 功能
 
-- 使用 `platformMenu` 作为菜单配置
+- 使用 `getPlatformMenuItems()` 从 `src/config/routes/platform.config.tsx` 动态生成菜单
 - 顶栏操作区：`MenuSearch`、`LanguageSwitch`、`FullScreen`、`DarkModeToggle`、`LockScreenButton`、`NotificationBell`，超出宽度自动折叠到 `OverflowActions`
 - 用户头像下拉菜单：个人信息、切换平台、退出登录
 - 面包屑正常显示层级结构
@@ -95,7 +95,7 @@ BaseLayout 采用"模板方法"模式，定义了布局的骨架结构，具体�
 | --- | --- | --- |
 | 路由前缀 | `/` | `/tenant-admin/:tenantId` |
 | 顶栏操作 | 全量 | 精简（无 LanguageSwitch、NotificationBell） |
-| 菜单来源 | `platformMenu` | `tenantMenu`（路径自动拼接 tenantId） |
+| 菜单来源 | `getPlatformMenuItems()` | `getTenantMenuItems()`（路径自动拼接 tenantId） |
 | 面包屑 | 正常层级 | 首级为租户名称 |
 | 用户菜单 | 切换平台 / 退出 | 返回平台 / 退出 |
 
