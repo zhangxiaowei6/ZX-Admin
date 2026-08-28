@@ -27,12 +27,6 @@ const queryClient = new QueryClient({
 const Router = import.meta.env.MODE === 'demo' ? HashRouter : BrowserRouter
 
 async function bootstrap() {
-  // 非 dev 模式且未配置真实后端时，启用 MSW mock（dev 由 vite-plugin-mock 在 Node 层处理）
-  if (!import.meta.env.DEV && !import.meta.env.VITE_API_BASE_URL) {
-    const { setupProdMockServer } = await import('../mock/mockProdServer')
-    await setupProdMockServer()
-  }
-
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
