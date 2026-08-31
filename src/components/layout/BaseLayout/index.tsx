@@ -178,11 +178,12 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
         return
       }
 
-      void useUserStore.persist.rehydrate().then(() => {
+      void (async () => {
+        await useUserStore.persist.rehydrate()
         const info = getUserInfo<User>()
         if (info) setStoreUserInfo(info)
         navigate(path || '/', { replace: true, state: { skipPageTransition: true } })
-      })
+      })()
     })
   }, [navigate, setStoreUserInfo, storeLogout])
 
