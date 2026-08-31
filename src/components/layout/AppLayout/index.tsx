@@ -23,7 +23,10 @@ export const AppLayout: FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { t } = useTranslation()
-  const permissions = useUserStore((s) => s.permissions)
+  const { saasName, permissions } = useUserStore(useShallow((state) => ({
+    saasName: state.saasName,
+    permissions: state.permissions,
+  })))
 
   const {
     showBreadcrumb,
@@ -63,6 +66,7 @@ export const AppLayout: FC = () => {
   const [menuOpenKeys, setMenuOpenKeys] = useState<string[]>(() => getParentKeys(location.pathname))
 
   const pathname = useMemo(() => location.pathname, [location.pathname])
+  const displaySystemName = saasName || systemName
 
   // 路由切换时同步展开的父菜单
   useEffect(() => {
@@ -121,15 +125,15 @@ export const AppLayout: FC = () => {
 
   return (
     <BaseLayout
-      title={systemName}
+      title={displaySystemName}
       logo={systemLogo}
       route={staticRoute}
       homePath="/"
       headerActions={headerActions}
       extraMenuItems={extraMenuItems}
       onExtraMenuClick={handleExtraMenuClick}
-      footerText={systemName}
-      watermarkContent={systemName}
+      footerText={displaySystemName}
+      watermarkContent={displaySystemName}
       breadcrumbRender={showBreadcrumb ? undefined : false}
       breadcrumbProps={{
         itemRender: (route: any) => <span>{route.breadcrumbName}</span>,

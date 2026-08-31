@@ -79,8 +79,8 @@ export const LoginPage: React.FC = () => {
         setSession(result)
         setUserInfo(result.userInfo)
         removeAllTabs()
-        message.success(`${t('entered')}${list[0].name}`)
-        setSystemName(list[0].name)
+        message.success(`${t('entered')}${result.saasName}`)
+        setSystemName(result.saasName)
         setPlatformLoading(null)
         navigate(list[0].path, { replace: true, state: { skipPageTransition: true } })
       } else {
@@ -112,8 +112,8 @@ export const LoginPage: React.FC = () => {
       setUserInfo(result.userInfo)
       removeAllTabs()
 
-      message.success(`${t('entered')}${platform.name}`)
-      setSystemName(platform.name)
+      message.success(`${t('entered')}${result.saasName}`)
+      setSystemName(result.saasName)
       if (isSwitchMode) {
         broadcastAuthEvent('switchPlatform', platform.path)
       }
