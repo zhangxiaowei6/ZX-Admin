@@ -1,3 +1,6 @@
+
+
+```markdown
 # ZX-Admin
 
 多平台多租户企业级管理后台，基于 React 18 + TypeScript + Ant Design 构建，为 SaaS 场景设计，开箱即用。
@@ -197,7 +200,7 @@ Mock 模式下确保 `VITE_API_BASE_URL` 为空，使用 `admin` / `zx@123`。�
 6. **添加 Mock**：在 `src/api/mock/index.ts` 注册固定路径和响应
 7. **补充国际化**：同步维护 `zh-CN`、`en-US`、`ja-JP` 对应命名空间
 
-无需修改任何框架代码。
+> 注：当前菜单与路由为静态配置，新增页面组件需同时更新路由配置；若仅将新菜单指向已有页面组件，则无需修改代码。无需修改框架核心代码。
 
 ---
 
@@ -224,3 +227,4 @@ Chrome 90+ / Firefox 88+ / Edge 90+ / Safari 14+
 ## 许可证
 
 [MIT](LICENSE) © 2026 zhangxiaowei6
+```
