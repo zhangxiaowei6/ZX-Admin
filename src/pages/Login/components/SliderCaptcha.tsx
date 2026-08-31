@@ -40,7 +40,7 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({ onVerified, style 
         borderRadius: TRACK_HEIGHT / 2,
         background: verified
           ? themeToken.colorSuccessBg
-          : themeToken.colorFillTertiary,
+          : themeToken.colorPrimaryBg,
         userSelect: 'none',
         overflow: 'hidden',
         transition: 'background 0.3s',
@@ -75,7 +75,7 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({ onVerified, style 
           gap: 6,
           fontSize: 13,
           letterSpacing: 1,
-          color: verified ? themeToken.colorSuccess : themeToken.colorTextTertiary,
+          color: verified ? themeToken.colorSuccess : themeToken.colorPrimaryText,
           pointerEvents: 'none',
           transition: 'opacity 0.25s, color 0.3s',
           opacity: (progress < 0.12 || verified) ? 1 : 0,
@@ -100,15 +100,15 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({ onVerified, style 
           justifyContent: 'center',
           background: verified
             ? themeToken.colorSuccess
-            : '#fff',
+            : themeToken.colorBgElevated,
           borderRadius: (TRACK_HEIGHT - 4) / 2,
           boxShadow: verified
             ? 'none'
             : dragging
-              ? `0 2px 12px ${themeToken.colorPrimary}30`
+              ? `0 2px 12px ${themeToken.colorPrimary}35`
               : hovered
-                ? '0 2px 8px rgba(0,0,0,0.1)'
-                : '0 1px 4px rgba(0,0,0,0.08)',
+                ? `0 2px 10px ${themeToken.colorPrimary}24`
+                : `0 1px 6px ${themeToken.colorPrimary}18`,
           cursor: verified ? 'default' : dragging ? 'grabbing' : 'grab',
           transform: `translateX(${offsetX}px)`,
           transition: verified ? 'all 0.3s ease' : baseTransition,
@@ -121,7 +121,7 @@ export const SliderCaptcha: React.FC<SliderCaptchaProps> = ({ onVerified, style 
           <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
             <path
               d="M1 7h12M9 2l5 5-5 5"
-              stroke={dragging ? themeToken.colorPrimary : hovered ? themeToken.colorPrimary : themeToken.colorTextTertiary}
+              stroke={dragging || hovered ? themeToken.colorPrimary : themeToken.colorPrimaryText}
               strokeWidth="1.8"
               strokeLinecap="round"
               strokeLinejoin="round"

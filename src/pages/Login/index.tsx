@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { message, Button, Form, Input, Card, Spin, theme } from 'antd'
 import { UserOutlined, LockOutlined, SafetyCertificateOutlined, CloudServerOutlined, SkinOutlined, AppstoreOutlined, RightOutlined } from '@ant-design/icons'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { preLogin, loginPlatform, getPlatforms, switchPlatform } from '@/api/modules/platform'
 import { useUserStore, useAppStore } from '@/stores'
@@ -17,19 +17,20 @@ type Step = 'login' | 'selectPlatform'
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const {
-    token,
-    setToken: setGlobalToken,
-    setUserInfo: setGlobalUserInfo,
-    setSaasName,
-    setPermissions,
-    logout: storeLogout,
-  } = useUserStore()
+  const { token, setSession, logout: storeLogout } = useUserStore(
+    useShallow((state) => ({
+      token: state.token,
+      setSession: state.setSession,
+      logout: state.logout,
+    })),
+  )
   const { setSystemName, removeAllTabs } = useAppStore(useShallow((s) => ({ setSystemName: s.setSystemName, removeAllTabs: s.removeAllTabs })))
   const { token: themeToken } = theme.useToken()
   const { t } = useTranslation('login')
 
-  const isSwitchMode = !!searchParams.get('switch') && !!token
+  const initialToken = useRef(token).current
+  const isSwitchMode = !!searchParams.get('switch') && !!initialToken
+  const shouldRedirectAuthenticatedUser = !!initialToken && !searchParams.get('switch')
 
   const [step, setStep] = useState<Step>(isSwitchMode ? 'selectPlatform' : 'login')
   const [platforms, setPlatforms] = useState<Platform[]>([])
@@ -40,13 +41,6 @@ export const LoginPage: React.FC = () => {
   const [hoveredPlatformId, setHoveredPlatformId] = useState<number | null>(null)
   const [loginLoading, setLoginLoading] = useState(false)
   const [stepTransition, setStepTransition] = useState(false)
-  const [exiting, setExiting] = useState(false)
-
-  /** 淡出整个页面后再跳转 */
-  const navigateWithTransition = (path: string) => {
-    setExiting(true)
-    setTimeout(() => navigate(path), 350)
-  }
 
   // 切换平台模式：用正式 token 获取平台列表
   useEffect(() => {
@@ -82,16 +76,13 @@ export const LoginPage: React.FC = () => {
         setPlatformLoading(list[0].id)
         const result = await loginPlatform({ tempToken: token, platformId: list[0].id })
         console.log('[Login] API response:', result) // 调试日志
-        setGlobalToken(result.token)
-        setSaasName(result.saasName)
-        setPermissions(result.permissions)
+        setSession(result)
         setUserInfo(result.userInfo)
-        setGlobalUserInfo(result.userInfo)
         removeAllTabs()
         message.success(`${t('entered')}${list[0].name}`)
         setSystemName(list[0].name)
-        navigateWithTransition(list[0].path)
         setPlatformLoading(null)
+        navigate(list[0].path, { replace: true, state: { skipPageTransition: true } })
       } else {
         setPlatforms(list)
         // 先淡出，再切换步骤并淡入
@@ -113,38 +104,24 @@ export const LoginPage: React.FC = () => {
   const handleSelectPlatform = async (platform: Platform) => {
     setPlatformLoading(platform.id)
     try {
-      let newToken: string
-      let saasName: string
-      let permissions: string[]
-      let userInfo: { id: number; username: string; nickname: string; avatar?: string }
+      const result = isSwitchMode
+        ? await switchPlatform({ platformId: platform.id })
+        : await loginPlatform({ tempToken, platformId: platform.id })
 
       if (isSwitchMode) {
-        const result = await switchPlatform({ platformId: platform.id })
         console.log('[Login] Switch platform response:', result) // 调试日志
         broadcastAuthEvent('switchPlatform')
-        newToken = result.token
-        saasName = result.saasName
-        permissions = result.permissions
-        userInfo = result.userInfo
       } else {
-        const result = await loginPlatform({ tempToken, platformId: platform.id })
         console.log('[Login] Login platform response:', result) // 调试日志
-        newToken = result.token
-        saasName = result.saasName
-        permissions = result.permissions
-        userInfo = result.userInfo
       }
 
-      setGlobalToken(newToken)
-      setSaasName(saasName)
-      setPermissions(permissions)
-      setUserInfo(userInfo)
-      setGlobalUserInfo(userInfo)
+      setSession(result)
+      setUserInfo(result.userInfo)
       removeAllTabs()
 
       message.success(`${t('entered')}${platform.name}`)
       setSystemName(platform.name)
-      navigateWithTransition(platform.path)
+      navigate(platform.path, { replace: true, state: { skipPageTransition: true } })
     } catch (err: any) {
       // switchPlatform 的 401 不再触发全局 handleUnauthorized，需在此处理
       if (err?.code === 401) {
@@ -230,23 +207,9 @@ export const LoginPage: React.FC = () => {
   )
 
   const loginStyles = `
-    @keyframes login-fade-in {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes login-slide-up {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
     .login-container {
       display: flex;
       height: 100vh;
-      animation: login-fade-in 0.5s ease-out;
-      transition: opacity 0.35s ease, transform 0.35s ease;
-    }
-    .login-container.login-exiting {
-      opacity: 0;
-      transform: scale(1.02);
     }
     .login-brand {
       flex: 1;
@@ -267,7 +230,6 @@ export const LoginPage: React.FC = () => {
       padding: 0 60px;
       background: #fff;
       position: relative;
-      animation: login-slide-up 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
     }
 
     /* 表单样式优化 */
@@ -427,8 +389,12 @@ export const LoginPage: React.FC = () => {
     </div>
   )
 
+  if (shouldRedirectAuthenticatedUser) {
+    return <Navigate to="/" replace state={{ skipPageTransition: true }} />
+  }
+
   return (
-    <div className={`login-container${exiting ? ' login-exiting' : ''}`}>
+    <div className="login-container">
       <style>{loginStyles}</style>
       {/* 左侧品牌区 */}
       <div

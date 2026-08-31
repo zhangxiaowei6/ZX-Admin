@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { User } from '@/types'
+import type { LoginResult, User } from '@/types'
 
 interface UserState {
   token: string | null
@@ -13,6 +13,7 @@ interface UserState {
   setSaasName: (name: string) => void
   setUserInfo: (info: User) => void
   setPermissions: (permissions: string[]) => void
+  setSession: (session: LoginResult) => void
   logout: () => void
 }
 
@@ -29,6 +30,13 @@ export const useUserStore = create<UserState>()(
       setSaasName: (saasName) => set({ saasName }),
       setUserInfo: (userInfo) => set({ userInfo }),
       setPermissions: (permissions) => set({ permissions, permissionsLoaded: true }),
+      setSession: ({ token, saasName, userInfo, permissions }) => set({
+        token,
+        saasName,
+        userInfo,
+        permissions,
+        permissionsLoaded: true,
+      }),
       logout: () => set({ token: null, saasName: '', userInfo: null, permissions: [], permissionsLoaded: false }),
     }),
     {

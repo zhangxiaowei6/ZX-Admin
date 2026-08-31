@@ -161,8 +161,7 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
     storeLogout()
     removeUserInfo()
     message.success(t('common:loggedOut'))
-    navigate('/login')
-  }, [navigate, storeLogout, t])
+  }, [storeLogout, t])
 
   // 监听其他标签页的登出/切换平台事件
   useEffect(() => {
@@ -170,10 +169,9 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
       if (event === 'logout' || event === 'switchPlatform') {
         storeLogout()
         removeUserInfo()
-        navigate('/login')
       }
     })
-  }, [navigate, storeLogout])
+  }, [storeLogout])
 
   const handleProfileSubmit = useCallback(() => {
     message.success(t('common:saveSuccess'))

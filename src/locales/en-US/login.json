@@ -6,7 +6,7 @@
   "enterPassword": "Please enter password",
   "passwordPlaceholder": "Password",
   "loginBtn": "Login",
-  "defaultAccount": "Default: admin / 123456",
+  "defaultAccount": "Default: admin / zx@123",
   "selectPlatformTab": "Switch Platform",
   "choosePlatformTab": "Select Platform",
   "selectPlatformDesc": "Select the management platform you want to enter",

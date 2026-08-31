@@ -35,13 +35,6 @@ export const Guard = memo(function Guard({ children }: { children: React.ReactNo
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  if (token && normalizedPath === '/login') {
-    const params = new URLSearchParams(location.search)
-    if (!params.get('switch')) {
-      return <Navigate to="/" replace />
-    }
-  }
-
   // token 存在但权限尚未从后端加载，等待中（避免放行未授权访问）
   if (token && !permissionsLoaded && !WHITE_LIST.includes(normalizedPath)) {
     return null

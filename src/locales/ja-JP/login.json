@@ -6,7 +6,7 @@
   "enterPassword": "パスワードを入力してください",
   "passwordPlaceholder": "パスワード",
   "loginBtn": "ログイン",
-  "defaultAccount": "デフォルト: admin / 123456",
+  "defaultAccount": "デフォルト: admin / zx@123",
   "selectPlatformTab": "プラットフォーム切替",
   "choosePlatformTab": "プラットフォーム選択",
   "selectPlatformDesc": "管理プラットフォームを選択してください",
