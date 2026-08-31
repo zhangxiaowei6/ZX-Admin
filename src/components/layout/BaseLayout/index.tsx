@@ -131,7 +131,13 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
     sidebarDark: s.sidebarDark,
   })))
 
-  const { userInfo, setUserInfo: setStoreUserInfo, logout: storeLogout } = useUserStore()
+  const { userInfo, setUserInfo: setStoreUserInfo, logout: storeLogout } = useUserStore(
+    useShallow((state) => ({
+      userInfo: state.userInfo,
+      setUserInfo: state.setUserInfo,
+      logout: state.logout,
+    })),
+  )
   const [profileVisible, setProfileVisible] = useState(false)
   const screens = Grid.useBreakpoint()
   const isMobile = screens.md !== undefined && !screens.md
@@ -165,13 +171,20 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
 
   // 监听其他标签页的登出/切换平台事件
   useEffect(() => {
-    return onAuthEvent((event) => {
-      if (event === 'logout' || event === 'switchPlatform') {
+    return onAuthEvent((event, path) => {
+      if (event === 'logout') {
         storeLogout()
         removeUserInfo()
+        return
       }
+
+      void useUserStore.persist.rehydrate().then(() => {
+        const info = getUserInfo<User>()
+        if (info) setStoreUserInfo(info)
+        navigate(path || '/', { replace: true, state: { skipPageTransition: true } })
+      })
     })
-  }, [storeLogout])
+  }, [navigate, setStoreUserInfo, storeLogout])
 
   const handleProfileSubmit = useCallback(() => {
     message.success(t('common:saveSuccess'))

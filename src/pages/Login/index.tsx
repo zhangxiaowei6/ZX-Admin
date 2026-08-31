@@ -108,19 +108,15 @@ export const LoginPage: React.FC = () => {
         ? await switchPlatform({ platformId: platform.id })
         : await loginPlatform({ tempToken, platformId: platform.id })
 
-      if (isSwitchMode) {
-        console.log('[Login] Switch platform response:', result) // 调试日志
-        broadcastAuthEvent('switchPlatform')
-      } else {
-        console.log('[Login] Login platform response:', result) // 调试日志
-      }
-
       setSession(result)
       setUserInfo(result.userInfo)
       removeAllTabs()
 
       message.success(`${t('entered')}${platform.name}`)
       setSystemName(platform.name)
+      if (isSwitchMode) {
+        broadcastAuthEvent('switchPlatform', platform.path)
+      }
       navigate(platform.path, { replace: true, state: { skipPageTransition: true } })
     } catch (err: any) {
       // switchPlatform 的 401 不再触发全局 handleUnauthorized，需在此处理

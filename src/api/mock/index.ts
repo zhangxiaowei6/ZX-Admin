@@ -16,11 +16,16 @@ const removeIds = <T extends { id: number }>(items: T[], ids: number[]) => items
 // eslint-disable-next-line no-unused-vars
 const updateIds = <T extends { id: number }>(items: T[], ids: number[], fn: (item: T) => T) => items.map((item) => ids.includes(item.id) ? fn(item) : item)
 const tree = <T extends { id: number; parentId: number; sort: number; children?: T[] }>(items: T[], clientType?: string) => buildTree(items.filter((item) => !clientType || (item as T & { clientType?: string }).clientType === clientType))
+const platformSession = (body: MockBody, msg: string) => {
+  const platform = platforms.find((item) => item.id === numberValue(paramsOf(body).platformId))
+  if (!platform) return notFound('平台')
+  return ok({ token: `mock-access-token-${platform.id}`, saasName: platform.name, permissions: [], userInfo: { id: 1, username: 'admin', nickname: '系统管理员', avatar: '' } }, msg)
+}
 
 const routes: MockRoute[] = [
   { method: 'POST', pattern: '/api/admin/auth/pre-login', handler: () => ok({ tempToken: 'mock-temp-token', platforms }, '预登录成功') },
-  { method: 'POST', pattern: '/api/admin/auth/login-platform', handler: () => ok({ token: 'mock-access-token', saasName: platforms[0].name, permissions: [], userInfo: { id: 1, username: 'admin', nickname: '系统管理员', avatar: '' } }, '登录成功') },
-  { method: 'POST', pattern: '/api/admin/auth/switch-platform', handler: () => ok({ token: 'mock-access-token', saasName: platforms[0].name, permissions: [], userInfo: { id: 1, username: 'admin', nickname: '系统管理员', avatar: '' } }, '切换成功') },
+  { method: 'POST', pattern: '/api/admin/auth/login-platform', handler: ({ body }) => platformSession(body, '登录成功') },
+  { method: 'POST', pattern: '/api/admin/auth/switch-platform', handler: ({ body }) => platformSession(body, '切换成功') },
   { method: 'POST', pattern: '/api/admin/auth/logout', handler: () => changed('登出成功') },
   { method: 'GET', pattern: '/api/admin/auth/info', handler: () => ok({ id: 1, username: 'admin', nickname: '系统管理员', avatar: '', roles: ['超级管理员'], permissions: [], platformId: 1 }) },
   { method: 'GET', pattern: '/api/admin/auth/platforms', handler: () => ok(platforms) },

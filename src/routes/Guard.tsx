@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import { Navigate, matchRoutes, useLocation } from 'react-router-dom'
 import { useUserStore } from '@/stores/useUserStore'
-import { getToken } from '@/utils/storage'
+import { useShallow } from 'zustand/react/shallow'
 import { routes } from './routes'
 
 const WHITE_LIST = ['/login', '/403', '/404']
@@ -21,8 +21,14 @@ const getRequiredPermission = (pathname: string): string | undefined => {
 }
 
 export const Guard = memo(function Guard({ children }: { children: React.ReactNode }) {
-  const { permissions, _hasHydrated, permissionsLoaded } = useUserStore()
-  const token = getToken()
+  const { token, permissions, _hasHydrated, permissionsLoaded } = useUserStore(
+    useShallow((state) => ({
+      token: state.token,
+      permissions: state.permissions,
+      _hasHydrated: state._hasHydrated,
+      permissionsLoaded: state.permissionsLoaded,
+    })),
+  )
   const location = useLocation()
   const normalizedPath = location.pathname.replace(/\/+$/, '') || '/'
 
