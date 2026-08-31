@@ -231,7 +231,8 @@ Services：
 
 - `VITE_API_BASE_URL` 为空或未设置时，`src/api/request.ts` 直接调用 `src/api/mock/` 中的静态注册表，不发起网络请求。
 - `VITE_API_BASE_URL` 配置为非空地址时，所有请求直接走 Axios 真实后端链路。
-- Mock 与真实 API 共用请求方法、路径、参数、响应结构、类型和错误解包；Mock 不维护状态、不使用随机数据或浏览器存储。
+- Mock 与真实 API 共用请求方法、路径、参数、响应结构、类型和错误解包；Mock 使用 `src/api/mock/` 内部的固定种子数据和带版本的 `sessionStorage` 会话状态，不使用随机数据。刷新页面保留状态，关闭标签页或清缓存后恢复种子数据。
+- Mock 状态只在 `VITE_API_BASE_URL` 为空的请求分支中懒加载和写入；真实 API 分支不得读取、修改或依赖 Mock 状态。
 - 新增接口时在 `src/api/mock/` 添加对应静态路径和固定响应，保持平台与租户域的路径分层语义。
 
 ## 本地存储与设置

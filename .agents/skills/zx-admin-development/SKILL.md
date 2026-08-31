@@ -47,7 +47,8 @@ description: 在 zx-admin 仓库中新增、修改、重构或审查 React/TypeS
 
 - API 定义放在 `src/api/modules/platform/` 或 `src/api/modules/tenant/`，统一调用 `src/api/request.ts`；业务代码不得创建旁路 Axios 实例。
 - `VITE_API_BASE_URL` 为空时，请求层调用 `src/api/mock/` 的静态注册表；配置非空地址时走真实 Axios 链路。Mock 与真实接口共用方法、路径、参数、类型和响应结构。
-- Mock 使用固定响应，不维护跨请求状态，不使用随机数据或浏览器存储。
+- Mock 使用固定种子数据和 `src/api/mock/` 内部带版本的 `sessionStorage` 会话状态；刷新页面保留，关闭标签页或清缓存后恢复，不使用随机数据。
+- Mock 状态必须懒加载且只存在于 `VITE_API_BASE_URL` 为空的请求分支；真实 Axios 分支不得读取、修改或依赖 Mock 状态。
 - 普通业务请求的 401 由请求层清理状态、广播登出并跳转；预登录、平台登录、平台列表和平台切换的 401 由调用方处理。
 - 前端可见的 `VITE_APP_SECRET`、Token 和 localStorage 不是可信安全边界。不要提交真实密钥，也不要在业务代码中绕过现有签名、加密或认证链路。
 

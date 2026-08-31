@@ -80,8 +80,8 @@ const { tableSize, tableBordered } = useAppStore(
 业务页面 / Hook
   -> src/api/modules/{platform|tenant}
   -> src/api/request.ts
-     -> VITE_API_BASE_URL 为空：src/api/mock/index.ts
-     -> VITE_API_BASE_URL 非空：Axios + Token + 签名 + 可选 AES
+     -> VITE_API_BASE_URL 为空：src/api/mock/index.ts + sessionStorage 会话状态
+     -> VITE_API_BASE_URL 非空：Axios + Token + 签名 + 可选 AES（不访问 Mock 状态）
   -> unwrapResponse(code === 200 时返回 data)
 ```
 
