@@ -4,6 +4,7 @@ import { Drawer, Button, Tabs, Space, message, theme, Modal, Input } from 'antd'
 import { SettingOutlined, CopyOutlined, UndoOutlined, ClearOutlined, ImportOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
 import { getPersistedAppSettings, sanitizeAppSettings, useAppStore } from '@/stores'
+import type { SettingsPreset } from '@/stores/useAppStore'
 import { ThemeSettings } from './ThemeSettings'
 import { LayoutSettings } from './LayoutSettings'
 import { TabsSettings } from './TabsSettings'
@@ -41,6 +42,7 @@ export const SettingsDrawer: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [importValue, setImportValue] = useState('')
+  const [activePreset, setActivePreset] = useState<SettingsPreset | null>('default')
 
   const [position, setPosition] = useState<{ x: number; y: number }>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -225,12 +227,23 @@ export const SettingsDrawer: React.FC = () => {
       const sanitized = sanitizeAppSettings(source)
       if (Object.keys(sanitized).length === 0) throw new Error('empty settings')
       applySettings(sanitized)
+      setActivePreset(null)
       setImportOpen(false)
       setImportValue('')
       message.success(t('importSuccess'))
     } catch {
       message.error(t('importInvalid'))
     }
+  }
+
+  const handleApplyPreset = (preset: SettingsPreset) => {
+    applyPreset(preset)
+    setActivePreset(preset)
+  }
+
+  const handleResetSettings = () => {
+    resetSettings()
+    setActivePreset('default')
   }
 
   const handleClearCache = () => {
@@ -320,10 +333,10 @@ export const SettingsDrawer: React.FC = () => {
         footer={
           <Space style={{ width: '100%' }} direction="vertical" size={12}>
             <Space.Compact block>
-              <Button style={{ width: '25%' }} onClick={() => applyPreset('default')}>{t('presetDefault')}</Button>
-              <Button style={{ width: '25%' }} onClick={() => applyPreset('compact')}>{t('presetCompact')}</Button>
-              <Button style={{ width: '25%' }} onClick={() => applyPreset('comfortable')}>{t('presetComfortable')}</Button>
-              <Button style={{ width: '25%' }} onClick={() => applyPreset('reducedMotion')}>{t('presetReducedMotion')}</Button>
+              <Button type={activePreset === 'default' ? 'primary' : 'default'} aria-pressed={activePreset === 'default'} style={{ width: '25%' }} onClick={() => handleApplyPreset('default')}>{t('presetDefault')}</Button>
+              <Button type={activePreset === 'compact' ? 'primary' : 'default'} aria-pressed={activePreset === 'compact'} style={{ width: '25%' }} onClick={() => handleApplyPreset('compact')}>{t('presetCompact')}</Button>
+              <Button type={activePreset === 'comfortable' ? 'primary' : 'default'} aria-pressed={activePreset === 'comfortable'} style={{ width: '25%' }} onClick={() => handleApplyPreset('comfortable')}>{t('presetComfortable')}</Button>
+              <Button type={activePreset === 'reducedMotion' ? 'primary' : 'default'} aria-pressed={activePreset === 'reducedMotion'} style={{ width: '25%' }} onClick={() => handleApplyPreset('reducedMotion')}>{t('presetReducedMotion')}</Button>
             </Space.Compact>
             <Button block icon={<CopyOutlined />} onClick={handleCopySettings}>
               {t('copySettings')}
@@ -335,7 +348,7 @@ export const SettingsDrawer: React.FC = () => {
               <Button
                 danger
                 icon={<UndoOutlined />}
-                onClick={resetSettings}
+                onClick={handleResetSettings}
                 style={{ width: '50%' }}
               >
                 {t('resetSettings')}

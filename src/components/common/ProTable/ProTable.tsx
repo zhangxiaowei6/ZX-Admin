@@ -1,5 +1,6 @@
 import { useRef, useCallback, useState, useMemo } from 'react'
-import { ProTable as AntProTable } from '@ant-design/pro-components'
+import type { Key } from 'react'
+import { IndexColumn, ProTable as AntProTable } from '@ant-design/pro-components'
 import type { ProTableProps, ProColumns } from '@ant-design/pro-components'
 import { Tooltip } from 'antd'
 import { DownloadOutlined } from '@ant-design/icons'
@@ -53,7 +54,7 @@ function ProTable<T extends Record<string, any>, U extends Record<string, any> =
   })))
   const dataRef = useRef<T[]>([])
   const [exportOpen, setExportOpen] = useState(false)
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([])
   const [selectedRows, setSelectedRows] = useState<T[]>([])
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
     if (!tableId || !tableRememberColumnWidths) return {}
@@ -93,7 +94,7 @@ function ProTable<T extends Record<string, any>, U extends Record<string, any> =
     ? {
         ...(typeof rowSelection === 'object' ? rowSelection : {}),
         selectedRowKeys,
-        onChange: (keys: React.Key[], rows: T[], info: { type: 'all' | 'none' | 'invert' | 'single' | 'multiple' }) => {
+        onChange: (keys: Key[], rows: T[], info: { type: 'all' | 'none' | 'invert' | 'single' | 'multiple' }) => {
           setSelectedRowKeys(keys)
           setSelectedRows(rows)
           if (typeof rowSelection === 'object') {
@@ -151,16 +152,14 @@ function ProTable<T extends Record<string, any>, U extends Record<string, any> =
 
     const indexColumn: ProColumns<T> = {
       title: t('common:index'),
-      dataIndex: '__index__',
       key: '__index__',
-      width: 60,
+      width: 48,
       align: 'center',
       fixed: 'left',
-      render: (_: any, __: T, index: number) => {
-        // 计算全局索引（考虑分页）
+      render: (_dom, _record, index) => {
         const current = (typeof pagination === 'object' && pagination.current) || 1
         const pageSize = (typeof pagination === 'object' && pagination.pageSize) || tableDefaultPageSize
-        return (current - 1) * pageSize + index + 1
+        return <IndexColumn border>{(current - 1) * pageSize + index + 1}</IndexColumn>
       },
     }
 
