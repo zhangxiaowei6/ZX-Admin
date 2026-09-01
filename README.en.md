@@ -6,7 +6,7 @@ Multi-platform multi-tenant enterprise admin dashboard, built with React 18 + Ty
 [![Stars](https://img.shields.io/github/stars/zhangxiaowei6/ZX-Admin?style=flat)](https://github.com/zhangxiaowei6/ZX-Admin)
 [![License](https://img.shields.io/github/license/zhangxiaowei6/ZX-Admin)](LICENSE)
 
-[Live Demo](https://zhangxiaowei6.github.io/ZX-Admin/) | Test account: `admin` / `zx@123` | [Changelog](./CHANGELOG.md) | [中文](./README.md)
+[Live Demo](https://zhangxiaowei6.github.io/zx-admin/) | Test account: `admin` / `zx@123` | [Changelog](./CHANGELOG.md) | [中文](./README.md)
 
 ---
 

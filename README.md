@@ -6,7 +6,7 @@
 [![Stars](https://img.shields.io/github/stars/zhangxiaowei6/ZX-Admin?style=flat)](https://github.com/zhangxiaowei6/ZX-Admin)
 [![License](https://img.shields.io/github/license/zhangxiaowei6/ZX-Admin)](LICENSE)
 
-[在线演示](https://zhangxiaowei6.github.io/ZX-Admin/) | 测试账号：`admin` / `zx@123` | [更新日志](./CHANGELOG.md) | [English](./README.en.md)
+[在线演示](https://zhangxiaowei6.github.io/zx-admin/) | 测试账号：`admin` / `zx@123` | [更新日志](./CHANGELOG.md) | [English](./README.en.md)
 
 ---
 
@@ -45,7 +45,7 @@ cp .env.example .env.local   # 按需填入实际配置
 npm run dev
 ```
 
-浏览器访问 http://localhost:3000，使用 `admin` / `zx@123` 登录。
+浏览器访问 http://localhost:3000 使用 `admin` / `zx@123` 登录。
 
 ---
 
