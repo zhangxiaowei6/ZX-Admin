@@ -115,6 +115,7 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
     contentWidth,
     contentPadding,
     sidebarDark,
+    showHeaderUserName,
   } = useAppStore(useShallow((s) => ({
     collapsed: s.collapsed, setCollapsed: s.setCollapsed,
     layoutMode: s.layoutMode, setLayoutMode: s.setLayoutMode,
@@ -129,6 +130,7 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
     contentWidth: s.contentWidth,
     contentPadding: s.contentPadding,
     sidebarDark: s.sidebarDark,
+    showHeaderUserName: s.showHeaderUserName,
   })))
 
   const { userInfo, setUserInfo: setStoreUserInfo, logout: storeLogout } = useUserStore(
@@ -242,9 +244,8 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
   const isNavDark = sidebarDark && !darkMode && layoutMode !== 'mix'
 
   const rightContentRender = useCallback(() => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap', overflow: 'hidden', color: isNavDark ? 'rgba(255,255,255,0.65)' : undefined }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap', overflow: 'hidden', color: isNavDark ? 'rgba(255,255,255,0.65)' : undefined }}>
       {headerActions}
-      <span style={{ width: 1, height: 20, flexShrink: 0, background: isNavDark ? 'rgba(255,255,255,0.2)' : themeToken.colorBorderSecondary, margin: isMobile ? '0 2px' : '0 4px' }} />
       <Dropdown
         menu={{ items: dropdownItems, onClick: handleMenuClick }}
         trigger={['click']}
@@ -256,12 +257,12 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
             gap: 8,
             cursor: 'pointer',
             padding: '0 8px',
-            borderRadius: 6,
-            height: 32,
+            borderRadius: 8,
+            height: 36,
             transition: 'background-color 0.2s',
             flexShrink: 0,
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = isNavDark ? 'rgba(255,255,255,0.08)' : themeToken.colorFillTertiary }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = isNavDark ? 'rgba(255,255,255,0.08)' : themeToken.colorBgTextHover }}
           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent' }}
         >
           <Avatar
@@ -271,7 +272,7 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
           >
             {userInfo?.nickname?.[0] || userInfo?.username?.[0] || 'A'}
           </Avatar>
-          {!isMobile && layoutMode === 'top' && (
+          {!isMobile && showHeaderUserName && (
             <span style={{ color: isNavDark ? '#ffffff' : themeToken.colorText, fontSize: 14, maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {userInfo?.nickname || userInfo?.username || t('common:admin')}
             </span>
@@ -279,7 +280,7 @@ export const BaseLayout: React.FC<BaseLayoutProps> = ({
         </div>
       </Dropdown>
     </div>
-  ), [userInfo, dropdownItems, handleMenuClick, headerActions, themeToken, isMobile, t, isNavDark])
+  ), [userInfo, dropdownItems, handleMenuClick, headerActions, themeToken, isMobile, showHeaderUserName, t, isNavDark])
 
   return (
     <>

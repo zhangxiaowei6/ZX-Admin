@@ -27,7 +27,7 @@ export const LanguageSwitch: React.FC = () => {
       trigger={['click']}
     >
       <Tooltip title={isMobile ? '' : t('switchLanguage')}>
-        <ActionIcon>
+        <ActionIcon ariaLabel={t('switchLanguage')}>
           <TranslationOutlined />
         </ActionIcon>
       </Tooltip>

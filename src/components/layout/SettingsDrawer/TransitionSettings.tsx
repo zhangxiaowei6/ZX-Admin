@@ -16,9 +16,13 @@ export const TransitionSettings: React.FC = () => {
   const {
     enableTransition, setEnableTransition,
     transitionName, setTransitionName,
+    motionPreference, setMotionPreference,
+    animationSpeed, setAnimationSpeed,
   } = useAppStore(useShallow((s) => ({
     enableTransition: s.enableTransition, setEnableTransition: s.setEnableTransition,
     transitionName: s.transitionName, setTransitionName: s.setTransitionName,
+    motionPreference: s.motionPreference, setMotionPreference: s.setMotionPreference,
+    animationSpeed: s.animationSpeed, setAnimationSpeed: s.setAnimationSpeed,
   })))
   const { t } = useTranslation('settings')
 
@@ -41,6 +45,32 @@ export const TransitionSettings: React.FC = () => {
           onChange={setTransitionName}
           options={transitionOptions}
           disabled={!enableTransition}
+          style={{ width: 120 }}
+          size="small"
+        />
+      </SettingRow>
+      <SettingRow label={t('transition.motionPreference')}>
+        <Select
+          value={motionPreference}
+          onChange={setMotionPreference}
+          options={[
+            { value: 'system', label: t('transition.system') },
+            { value: 'full', label: t('transition.full') },
+            { value: 'reduced', label: t('transition.reduced') },
+          ]}
+          style={{ width: 120 }}
+          size="small"
+        />
+      </SettingRow>
+      <SettingRow label={t('transition.animationSpeed')}>
+        <Select
+          value={animationSpeed}
+          onChange={setAnimationSpeed}
+          options={[
+            { value: 'fast', label: t('transition.fast') },
+            { value: 'standard', label: t('transition.standard') },
+            { value: 'relaxed', label: t('transition.relaxed') },
+          ]}
           style={{ width: 120 }}
           size="small"
         />

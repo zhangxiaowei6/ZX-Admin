@@ -29,7 +29,7 @@ export const LockScreenButton: React.FC = () => {
   return (
     <>
       <Tooltip title={isMobile ? '' : t('lockScreen')}>
-        <ActionIcon onClick={() => setVisible(true)}>
+        <ActionIcon ariaLabel={t('lockScreen')} onClick={() => setVisible(true)}>
           <LockOutlined />
         </ActionIcon>
       </Tooltip>

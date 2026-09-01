@@ -9,6 +9,7 @@ import { getProductSpecs, saveProductSpec, deleteProductSpec } from '@/api/modul
 import { useAppStore } from '@/stores'
 import { FORM_SIZE_MAP } from '@/constants/ui'
 import type { ProductSpec, TenantProduct } from '@/types'
+import { useShallow } from 'zustand/react/shallow'
 
 interface SpecDrawerProps {
   open: boolean
@@ -23,10 +24,14 @@ export const SpecDrawer: React.FC<SpecDrawerProps> = ({ open, product, onClose }
   const [editableKeys, setEditableKeys] = useState<React.Key[]>([])
   const [dataSource, setDataSource] = useState<ProductSpec[]>([])
 
-  const formDisplayMode = useAppStore((s) => s.formDisplayMode)
+  const { formDisplayMode, formDrawerPlacement } = useAppStore(useShallow((state) => ({
+    formDisplayMode: state.formDisplayMode,
+    formDrawerPlacement: state.formDrawerPlacement,
+  })))
 
   const isDrawer = formDisplayMode === 'drawer'
-  const width = isDrawer ? FORM_SIZE_MAP.large.drawer : FORM_SIZE_MAP.large.modal
+  const isVerticalDrawer = formDrawerPlacement === 'top' || formDrawerPlacement === 'bottom'
+  const width = FORM_SIZE_MAP.large.modal
 
   const productId = product?.id ?? 0
 
@@ -178,7 +183,10 @@ export const SpecDrawer: React.FC<SpecDrawerProps> = ({ open, product, onClose }
         title={title}
         open={open}
         onClose={handleClose}
-        width={width}
+        placement={formDrawerPlacement}
+        {...(isVerticalDrawer
+          ? { height: FORM_SIZE_MAP.large.drawerHeight }
+          : { width: FORM_SIZE_MAP.large.drawer })}
         destroyOnClose
       >
         {tableContent}

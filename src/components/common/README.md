@@ -53,6 +53,7 @@ const DashboardPage = () => (
 - **表单展示模式**：根据 `formDisplayMode` 自动切换弹窗 / 抽屉
 - **表单列数**：根据 `formColumns` 自动开启 grid 布局
 - **表单大小**：根据 `formSizePreset` 自动设置宽度（small/medium/large）
+- **抽屉方向**：支持 left/right/top/bottom；左右使用宽度档位，上下使用 40/60/80vh 高度档位
 - **destroyOnClose**：默认开启
 
 ### Props
@@ -143,6 +144,7 @@ import { FormContainer } from '@/components/common/FormContainer'
 
 - **全局表格尺寸/边框**：自动读取 `useAppStore` 中的 `tableSize`、`tableBordered` 配置
 - **可拖拽列宽**：开启全局 `tableResizable` 后，列头可拖拽调整宽度
+- **多设备拖拽**：列宽调整基于 Pointer Events，支持鼠标、触控笔和触摸屏
 - **数据导出**：开启 `exportable` 后，工具栏出现导出图标，点击弹出导出弹窗
 - **行选择受控**：开启导出后自动接管 `rowSelection`，支持按选中行导出
 - **默认分页**：内置 `showSizeChanger`、`showQuickJumper`，页码选项来自 `PAGINATION` 常量
@@ -183,6 +185,7 @@ import { ProTable } from '@/components/common/ProTable'
 
 - **全局表格尺寸/边框**：自动读取 `useAppStore` 中的 `tableSize`、`tableBordered` 配置
 - **可拖拽列宽**：开启全局 `tableResizable` 后，列头可拖拽调整宽度
+- **多设备拖拽**：列宽调整基于 Pointer Events，支持鼠标、触控笔和触摸屏
 - **数据导出**：开启 `exportable` 后，工具栏出现导出图标，点击弹出导出弹窗
 - **行选择兼容**：拦截 `rowSelection.onChange` 捕获选中行数据供导出使用，不影响页面自身的选中状态管理
 - **默认分页**：内置 `showSizeChanger`、`showQuickJumper`，页码选项来自 `PAGINATION` 常量

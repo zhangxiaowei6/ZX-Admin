@@ -3,7 +3,7 @@ import { ConfigProvider, theme as antTheme } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
 import enUS from 'antd/locale/en_US'
 import jaJP from 'antd/locale/ja_JP'
-import { useAppStore } from '@/stores'
+import { useAppStore, getAnimationDuration, isReducedMotion } from '@/stores'
 import { useShallow } from 'zustand/react/shallow'
 import type { LocaleType } from '@/locales'
 
@@ -14,7 +14,7 @@ const antdLocaleMap: Record<LocaleType, typeof zhCN> = {
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { darkMode, primaryColor, compactMode, colorWeak, grayMode, fontSize, borderRadius, locale } = useAppStore(useShallow((s) => ({ darkMode: s.darkMode, primaryColor: s.primaryColor, compactMode: s.compactMode, colorWeak: s.colorWeak, grayMode: s.grayMode, fontSize: s.fontSize, borderRadius: s.borderRadius, locale: s.locale })))
+  const { darkMode, primaryColor, compactMode, colorWeak, grayMode, fontSize, borderRadius, locale, motionPreference, animationSpeed } = useAppStore(useShallow((s) => ({ darkMode: s.darkMode, primaryColor: s.primaryColor, compactMode: s.compactMode, colorWeak: s.colorWeak, grayMode: s.grayMode, fontSize: s.fontSize, borderRadius: s.borderRadius, locale: s.locale, motionPreference: s.motionPreference, animationSpeed: s.animationSpeed })))
 
   const antdLocale = useMemo(() => antdLocaleMap[locale] || zhCN, [locale])
 
@@ -31,6 +31,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.classList.toggle('color-weak', colorWeak)
     root.classList.toggle('dark', darkMode)
   }, [grayMode, colorWeak, darkMode])
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.style.setProperty('--app-animation-duration', `${getAnimationDuration(animationSpeed)}ms`)
+    root.classList.toggle('reduced-motion', isReducedMotion(motionPreference))
+  }, [animationSpeed, motionPreference])
 
   // 暗黑模式 body 背景色（同步更新，避免 View Transition 闪烁）
   useMemo(() => {

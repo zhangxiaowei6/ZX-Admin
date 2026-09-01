@@ -22,6 +22,11 @@ export const TableSettings: React.FC = () => {
     tableShowIndex, setTableShowIndex,
     tableFixedHeader, setTableFixedHeader,
     tableMaxHeight, setTableMaxHeight,
+    tableShowSizeChanger, setTableShowSizeChanger,
+    tableShowQuickJumper, setTableShowQuickJumper,
+    tableShowTotal, setTableShowTotal,
+    tablePaginationPosition, setTablePaginationPosition,
+    tableRememberColumnWidths, setTableRememberColumnWidths,
   } = useAppStore(useShallow((s) => ({
     tableSize: s.tableSize, setTableSize: s.setTableSize,
     tableBordered: s.tableBordered, setTableBordered: s.setTableBordered,
@@ -31,6 +36,11 @@ export const TableSettings: React.FC = () => {
     tableShowIndex: s.tableShowIndex, setTableShowIndex: s.setTableShowIndex,
     tableFixedHeader: s.tableFixedHeader, setTableFixedHeader: s.setTableFixedHeader,
     tableMaxHeight: s.tableMaxHeight, setTableMaxHeight: s.setTableMaxHeight,
+    tableShowSizeChanger: s.tableShowSizeChanger, setTableShowSizeChanger: s.setTableShowSizeChanger,
+    tableShowQuickJumper: s.tableShowQuickJumper, setTableShowQuickJumper: s.setTableShowQuickJumper,
+    tableShowTotal: s.tableShowTotal, setTableShowTotal: s.setTableShowTotal,
+    tablePaginationPosition: s.tablePaginationPosition, setTablePaginationPosition: s.setTablePaginationPosition,
+    tableRememberColumnWidths: s.tableRememberColumnWidths, setTableRememberColumnWidths: s.setTableRememberColumnWidths,
   })))
   const { t } = useTranslation('settings')
 
@@ -73,6 +83,30 @@ export const TableSettings: React.FC = () => {
             { label: '100', value: 100 },
           ]}
         />
+      </SettingRow>
+      <SettingRow label={t('table.showSizeChanger')}>
+        <Switch checked={tableShowSizeChanger} onChange={setTableShowSizeChanger} />
+      </SettingRow>
+      <SettingRow label={t('table.showQuickJumper')}>
+        <Switch checked={tableShowQuickJumper} onChange={setTableShowQuickJumper} />
+      </SettingRow>
+      <SettingRow label={t('table.showTotal')}>
+        <Switch checked={tableShowTotal} onChange={setTableShowTotal} />
+      </SettingRow>
+      <SettingRow label={t('table.paginationPosition')}>
+        <Segmented
+          size="small"
+          value={tablePaginationPosition}
+          onChange={(value) => setTablePaginationPosition(value as 'left' | 'center' | 'right')}
+          options={[
+            { value: 'left', label: t('table.left') },
+            { value: 'center', label: t('table.center') },
+            { value: 'right', label: t('table.right') },
+          ]}
+        />
+      </SettingRow>
+      <SettingRow label={t('table.rememberColumnWidths')}>
+        <Switch checked={tableRememberColumnWidths} onChange={setTableRememberColumnWidths} />
       </SettingRow>
       <SettingRow label={t('table.tableFixedHeader')}>
         <Switch checked={tableFixedHeader} onChange={setTableFixedHeader} />

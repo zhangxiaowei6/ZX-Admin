@@ -7,7 +7,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { getPlatformMenuItems, type MenuItem } from '@/config/routes'
 import { filterMenuByPermissions } from '@/services/menu.service'
 import { BaseLayout } from '../BaseLayout'
-import { MenuSearch, FullScreen, DarkModeToggle, LockScreenButton, NotificationBell, LanguageSwitch, OverflowActions, ActionDivider } from '../HeaderActions'
+import { HeaderToolbar } from '../HeaderActions'
 
 // 递归转换菜单数据为 ProLayout route 格式
 const convertMenuToRoutes = (items: MenuItem[]): any[] =>
@@ -95,21 +95,7 @@ export const AppLayout: FC = () => {
     { key: 'switchPlatform', label: t('common:switchPlatform'), icon: <SwapOutlined /> },
   ], [t])
 
-  const headerActions = useMemo(() => (
-    <OverflowActions gap={4}>
-      {/* 功能组：搜索和通知 */}
-      <MenuSearch menuItems={filteredMenuItems} />
-      <NotificationBell />
-
-      <ActionDivider />
-
-      {/* 设置组：语言、主题、全屏、锁屏 */}
-      <LanguageSwitch />
-      <DarkModeToggle />
-      <FullScreen />
-      <LockScreenButton />
-    </OverflowActions>
-  ), [filteredMenuItems])
+  const headerActions = useMemo(() => <HeaderToolbar menuItems={filteredMenuItems} />, [filteredMenuItems])
 
   const menuProps = useMemo(() => ({
     ...(menuAccordion ? {

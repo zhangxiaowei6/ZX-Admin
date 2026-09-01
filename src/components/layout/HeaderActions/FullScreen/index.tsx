@@ -26,7 +26,7 @@ export const FullScreen: React.FC = () => {
 
   return (
     <Tooltip title={isMobile ? '' : (isFullscreen ? t('exitFullscreen') : t('fullscreen'))}>
-      <ActionIcon onClick={toggle}>
+      <ActionIcon ariaLabel={isFullscreen ? t('exitFullscreen') : t('fullscreen')} onClick={toggle}>
         {isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
       </ActionIcon>
     </Tooltip>

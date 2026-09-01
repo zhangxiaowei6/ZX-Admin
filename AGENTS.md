@@ -165,9 +165,11 @@ pages/ModuleName/
 
 尺寸映射位于 `src/constants/ui/formSize.ts`：
 
-- Small：Modal 520px / Drawer 480px
-- Medium：Modal 720px / Drawer 700px
-- Large：Modal 960px / Drawer 1000px
+- Small：Modal 520px / 左右 Drawer 480px / 上下 Drawer 40vh
+- Medium：Modal 720px / 左右 Drawer 700px / 上下 Drawer 60vh
+- Large：Modal 960px / 左右 Drawer 1000px / 上下 Drawer 80vh
+
+业务表单抽屉支持 `left`、`right`、`top`、`bottom` 四个方向；页面传入的 `drawerProps` 优先于全局方向和尺寸设置。
 
 ### 通用组件
 

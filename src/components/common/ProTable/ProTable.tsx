@@ -18,12 +18,13 @@ interface ExportableProTableProps<T extends Record<string, any>, U extends Recor
   exportFileName?: string
   /** 获取全量数据的回调（用于"全量数据"导出） */
   onExportAllData?: () => Promise<T[]>
+  tableId?: string
 }
 
 function ProTable<T extends Record<string, any>, U extends Record<string, any> = Record<string, any>>(
   props: ExportableProTableProps<T, U>
 ) {
-  const { exportable, exportFileName, onExportAllData, postData, columns, rowSelection, optionsRender, pagination, scroll, ...restProps } = props
+  const { exportable, exportFileName, onExportAllData, tableId, postData, columns, rowSelection, optionsRender, pagination, scroll, ...restProps } = props
   const { t } = useTranslation()
   const {
     tableSize,
@@ -34,6 +35,7 @@ function ProTable<T extends Record<string, any>, U extends Record<string, any> =
     tableShowIndex,
     tableFixedHeader,
     tableMaxHeight
+    , tableShowSizeChanger, tableShowQuickJumper, tableShowTotal, tablePaginationPosition, tableRememberColumnWidths
   } = useAppStore(useShallow((s) => ({
     tableSize: s.tableSize,
     tableBordered: s.tableBordered,
@@ -43,12 +45,24 @@ function ProTable<T extends Record<string, any>, U extends Record<string, any> =
     tableShowIndex: s.tableShowIndex,
     tableFixedHeader: s.tableFixedHeader,
     tableMaxHeight: s.tableMaxHeight,
+    tableShowSizeChanger: s.tableShowSizeChanger,
+    tableShowQuickJumper: s.tableShowQuickJumper,
+    tableShowTotal: s.tableShowTotal,
+    tablePaginationPosition: s.tablePaginationPosition,
+    tableRememberColumnWidths: s.tableRememberColumnWidths,
   })))
   const dataRef = useRef<T[]>([])
   const [exportOpen, setExportOpen] = useState(false)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [selectedRows, setSelectedRows] = useState<T[]>([])
-  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({})
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
+    if (!tableId || !tableRememberColumnWidths) return {}
+    try {
+      return JSON.parse(localStorage.getItem(`table-column-widths:${tableId}`) || '{}') as Record<string, number>
+    } catch {
+      return {}
+    }
+  })
 
   const handlePostData = useCallback(
     (data: T[]) => {
@@ -93,11 +107,12 @@ function ProTable<T extends Record<string, any>, U extends Record<string, any> =
   const defaultPagination = pagination === false
     ? false
     : {
-        showSizeChanger: true,
-        showQuickJumper: true,
+        showSizeChanger: tableShowSizeChanger,
+        showQuickJumper: tableShowQuickJumper,
+        showTotal: tableShowTotal ? (total: number) => t('common:totalItems', { count: total }) : undefined,
+        position: (tablePaginationPosition === 'center' ? ['bottomCenter'] : tablePaginationPosition === 'left' ? ['bottomLeft'] : ['bottomRight']) as ('topLeft' | 'topCenter' | 'topRight' | 'bottomLeft' | 'bottomCenter' | 'bottomRight')[],
         pageSizeOptions: PAGINATION.PAGE_SIZE_OPTIONS.map(String),
         defaultPageSize: tableDefaultPageSize,
-        pageSize: tableDefaultPageSize,
         ...(typeof pagination === 'object' ? pagination : {}),
       }
 
@@ -107,23 +122,28 @@ function ProTable<T extends Record<string, any>, U extends Record<string, any> =
     return columns.map((col) => {
       const key = String((col as ProColumns<T>).dataIndex || (col as ProColumns<T>).key || '')
       if (!key) return col
-
-      // 使用已保存的宽度，或列定义的宽度，或默认宽度 150
       const width = columnWidths[key] ?? (col as ProColumns<T>).width ?? 150
-
+      const originalOnHeaderCell = (col as ProColumns<T>).onHeaderCell
       return {
         ...col,
         width,
-        onHeaderCell: () => ({
+        onHeaderCell: (column) => ({
+          ...originalOnHeaderCell?.(column),
           resizableWidth: width,
           resizable: true,
           onResizeEnd: (newWidth: number) => {
-            setColumnWidths((prev) => ({ ...prev, [key]: newWidth }))
+            setColumnWidths((prev) => {
+              const next = { ...prev, [key]: newWidth }
+              if (tableId && tableRememberColumnWidths) {
+                localStorage.setItem(`table-column-widths:${tableId}`, JSON.stringify(next))
+              }
+              return next
+            })
           },
         }),
       } as ProColumns<T>
     })
-  }, [tableResizable, columns, columnWidths])
+  }, [tableResizable, columns, columnWidths, tableId, tableRememberColumnWidths])
 
   // 添加序号列
   const finalColumns = useMemo(() => {

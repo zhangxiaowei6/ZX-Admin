@@ -157,7 +157,6 @@ export const TenantProductPage: React.FC = () => {
         options={{ density: true, setting: true, reload: true }}
         exportable
         exportFileName={t('product:title')}
-        pagination={{ pageSize: 10 }}
         rowSelection={{
           selectedRowKeys,
           onChange: (keys) => setSelectedRowKeys(keys),

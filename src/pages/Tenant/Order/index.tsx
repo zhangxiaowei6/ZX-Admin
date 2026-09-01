@@ -71,7 +71,6 @@ export const TenantOrderPage: React.FC = () => {
         }}
         rowKey="id"
         search={{ labelWidth: 'auto' }}
-        pagination={{ pageSize: 10 }}
         headerTitle={t('order:title')}
         exportable
         exportFileName={t('order:title')}

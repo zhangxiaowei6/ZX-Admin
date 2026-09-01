@@ -195,7 +195,7 @@ export const NotificationBell: React.FC = () => {
       rootClassName="notification-bell-popover"
     >
       <Tooltip title={isMobile ? '' : tCommon('notifications')} open={open ? false : undefined}>
-        <ActionIcon style={{ position: 'relative' }}>
+        <ActionIcon ariaLabel={tCommon('notifications')} style={{ position: 'relative' }}>
           <BellOutlined />
           {unreadCount.total > 0 && (
             <span

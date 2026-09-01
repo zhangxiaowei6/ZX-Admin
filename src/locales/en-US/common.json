@@ -123,5 +123,7 @@
   "loading": "Loading...",
   "newVersionAvailable": "A new version is available. Please refresh to get the latest features.",
   "refreshNow": "Refresh Now",
-  "total": "Total"
+  "total": "Total",
+  "totalItems": "{{count}} items",
+  "moreActions": "More actions"
 }

@@ -1,6 +1,14 @@
 {
   "drawerTitle": "プロジェクト設定",
   "copySettings": "設定をコピー",
+  "importSettings": "設定をインポート",
+  "importPlaceholder": "このプロジェクトからエクスポートした設定 JSON を貼り付けてください",
+  "importSuccess": "設定をインポートしました",
+  "importInvalid": "設定内容が無効です",
+  "presetDefault": "デフォルト",
+  "presetCompact": "コンパクト",
+  "presetComfortable": "快適",
+  "presetReducedMotion": "動きを減らす",
   "resetSettings": "設定をリセット",
   "clearCache": "キャッシュをクリア",
   "confirm": "確認",
@@ -10,6 +18,7 @@
   "copiedSuccess": "設定をクリップボードにコピーしました",
   "tabTheme": "テーマ",
   "tabLayout": "レイアウト",
+  "tabHeader": "ヘッダー",
   "tabTabs": "タブ",
   "tabTransition": "アニメーション",
   "tabTable": "テーブル",
@@ -57,6 +66,8 @@
     "chrome": "Chrome風",
     "rounded": "丸角",
     "tabLimit": "タブ上限",
+    "restoreTabs": "更新後にタブを復元",
+    "showTabIcon": "タブアイコンを表示",
     "unlimited": "無制限",
     "count": "{{count}} 個"
   },
@@ -67,7 +78,29 @@
     "slideLeft": "左スライド",
     "slideUp": "上スライド",
     "zoom": "ズーム",
-    "none": "なし"
+    "none": "なし",
+    "motionPreference": "モーション設定",
+    "system": "システムに従う",
+    "full": "フルモーション",
+    "reduced": "モーションを減らす",
+    "animationSpeed": "アニメーション速度",
+    "fast": "速い",
+    "standard": "標準",
+    "relaxed": "ゆっくり"
+  },
+  "header": {
+    "menuSearch": "メニュー検索",
+    "notification": "通知",
+    "language": "言語切替",
+    "darkMode": "テーマ切替",
+    "fullscreen": "全画面",
+    "lockScreen": "画面ロック",
+    "showUserName": "ユーザー名を表示",
+    "primaryGroup": "情報とナビゲーション",
+    "utilityGroup": "外観とシステム",
+    "moveUp": "上へ",
+    "moveDown": "下へ",
+    "reset": "ヘッダーをリセット"
   },
   "table": {
     "tableSize": "テーブルサイズ",
@@ -80,7 +113,15 @@
     "tableShowIndex": "序号列を表示",
     "tableDefaultPageSize": "デフォルトページサイズ",
     "tableFixedHeader": "ヘッダー固定",
-    "tableMaxHeight": "最大高さ"
+    "tableMaxHeight": "最大高さ",
+    "showSizeChanger": "ページサイズ切替を表示",
+    "showQuickJumper": "クイックジャンプを表示",
+    "showTotal": "合計を表示",
+    "paginationPosition": "ページネーション位置",
+    "left": "左",
+    "center": "中央",
+    "right": "右",
+    "rememberColumnWidths": "列幅を記憶"
   },
   "form": {
     "formDisplay": "フォーム表示",
@@ -100,7 +141,13 @@
     "alignLeft": "左揃え",
     "alignRight": "右揃え",
     "formComponentSize": "コンポーネントサイズ",
-    "formColon": "ラベルコロン"
+    "formColon": "ラベルコロン",
+    "drawerPlacement": "ドロワー位置",
+    "labelWidth": "ラベル幅",
+    "left": "左",
+    "right": "右",
+    "top": "上",
+    "bottom": "下"
   },
   "system": {
     "systemName": "システム名",

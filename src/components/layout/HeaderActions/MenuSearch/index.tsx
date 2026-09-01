@@ -88,7 +88,7 @@ export const MenuSearch: React.FC<MenuSearchProps> = ({ menuItems, basePath = ''
   return (
     <>
       <Tooltip title={isMobile ? '' : t('searchMenu')}>
-        <ActionIcon onClick={() => setOpen(true)}>
+        <ActionIcon ariaLabel={t('searchMenu')} onClick={() => setOpen(true)}>
           <SearchOutlined />
         </ActionIcon>
       </Tooltip>

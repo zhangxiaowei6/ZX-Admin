@@ -11,6 +11,8 @@ import 'dayjs/locale/ja'
 
 export type LayoutMode = 'side' | 'top' | 'mix'
 export type PageTransition = 'fade' | 'slide-left' | 'slide-up' | 'zoom' | 'none'
+export type MotionPreference = 'system' | 'full' | 'reduced'
+export type AnimationSpeed = 'fast' | 'standard' | 'relaxed'
 export type FormDisplayMode = 'modal' | 'drawer'
 export type FormColumns = 1 | 2
 export type FormSizePreset = 'small' | 'medium' | 'large'
@@ -21,6 +23,26 @@ export type TabStyle = 'card' | 'line' | 'chrome' | 'rounded'
 export type ContentWidth = 'fluid' | 'fixed'
 export type TableSize = 'large' | 'middle' | 'small'
 export type SideMenuType = 'sub' | 'group'
+export type FormDrawerPlacement = 'left' | 'right' | 'top' | 'bottom'
+export type FormLabelWidth = 80 | 100 | 120 | 140
+export type TablePaginationPosition = 'left' | 'center' | 'right'
+export type HeaderActionKey = 'menuSearch' | 'notification' | 'language' | 'darkMode' | 'fullscreen' | 'lockScreen'
+export type SettingsPreset = 'default' | 'compact' | 'comfortable' | 'reducedMotion'
+export type SettingsGroup = 'theme' | 'layout' | 'header' | 'tabs' | 'transition' | 'table' | 'form' | 'system'
+
+export interface HeaderActionVisibility {
+  menuSearch: boolean
+  notification: boolean
+  language: boolean
+  darkMode: boolean
+  fullscreen: boolean
+  lockScreen: boolean
+}
+
+export interface HeaderActionOrder {
+  primary: Array<'menuSearch' | 'notification'>
+  utility: Array<'language' | 'darkMode' | 'fullscreen' | 'lockScreen'>
+}
 
 export interface TabItem {
   key: string
@@ -54,16 +76,25 @@ interface AppSettings {
   sideMenuType: SideMenuType
   contentPadding: number
 
+  // 顶部工具栏
+  headerActionVisibility: HeaderActionVisibility
+  headerActionOrder: HeaderActionOrder
+  showHeaderUserName: boolean
+
   // 标签页
   showTabs: boolean
   tabStyle: TabStyle
   maxTabs: number
+  restoreTabs: boolean
+  showTabIcon: boolean
   tabs: TabItem[]
   activeTabKey: string
 
   // 动画
   enableTransition: boolean
   transitionName: PageTransition
+  motionPreference: MotionPreference
+  animationSpeed: AnimationSpeed
 
   // 锁屏
   isLocked: boolean
@@ -77,6 +108,8 @@ interface AppSettings {
   formComponentSize: FormComponentSize
   formColon: boolean
   formLayout: FormLayout
+  formDrawerPlacement: FormDrawerPlacement
+  formLabelWidth: FormLabelWidth
 
   // 系统
   systemName: string
@@ -93,6 +126,11 @@ interface AppSettings {
   tableShowIndex: boolean
   tableFixedHeader: boolean
   tableMaxHeight: number
+  tableShowSizeChanger: boolean
+  tableShowQuickJumper: boolean
+  tableShowTotal: boolean
+  tablePaginationPosition: TablePaginationPosition
+  tableRememberColumnWidths: boolean
 
   // 国际化
   locale: LocaleType
@@ -124,10 +162,16 @@ interface AppActions {
   setSideMenuType: (v: SideMenuType) => void
   setContentPadding: (v: number) => void
 
+  setHeaderActionVisible: (key: HeaderActionKey, value: boolean) => void
+  moveHeaderAction: (group: keyof HeaderActionOrder, key: HeaderActionKey, direction: -1 | 1) => void
+  setShowHeaderUserName: (v: boolean) => void
+
   // 标签页
   setShowTabs: (v: boolean) => void
   setTabStyle: (v: TabStyle) => void
   setMaxTabs: (v: number) => void
+  setRestoreTabs: (v: boolean) => void
+  setShowTabIcon: (v: boolean) => void
   addTab: (tab: TabItem) => void
   removeTab: (key: string) => void
   removeOtherTabs: (key: string, scope?: string) => void
@@ -137,6 +181,8 @@ interface AppActions {
   // 动画
   setEnableTransition: (v: boolean) => void
   setTransitionName: (v: PageTransition) => void
+  setMotionPreference: (v: MotionPreference) => void
+  setAnimationSpeed: (v: AnimationSpeed) => void
 
   // 锁屏
   setIsLocked: (v: boolean) => void
@@ -150,6 +196,8 @@ interface AppActions {
   setFormComponentSize: (v: FormComponentSize) => void
   setFormColon: (v: boolean) => void
   setFormLayout: (v: FormLayout) => void
+  setFormDrawerPlacement: (v: FormDrawerPlacement) => void
+  setFormLabelWidth: (v: FormLabelWidth) => void
 
   // 系统
   setSystemName: (v: string) => void
@@ -166,9 +214,18 @@ interface AppActions {
   setTableShowIndex: (v: boolean) => void
   setTableFixedHeader: (v: boolean) => void
   setTableMaxHeight: (v: number) => void
+  setTableShowSizeChanger: (v: boolean) => void
+  setTableShowQuickJumper: (v: boolean) => void
+  setTableShowTotal: (v: boolean) => void
+  setTablePaginationPosition: (v: TablePaginationPosition) => void
+  setTableRememberColumnWidths: (v: boolean) => void
 
   // 国际化
   setLocale: (v: LocaleType) => void
+
+  applySettings: (settings: Partial<PersistedAppSettings>) => void
+  applyPreset: (preset: SettingsPreset) => void
+  resetSettingsGroup: (group: SettingsGroup) => void
 
   // 通用
   resetSettings: () => void
@@ -176,7 +233,172 @@ interface AppActions {
 
 type AppState = AppSettings & AppActions
 
+export type PersistedAppSettings = Omit<AppSettings, 'isLocked' | 'lockPassword' | 'tabs' | 'activeTabKey'> & {
+  tabs?: TabItem[]
+  activeTabKey?: string
+}
+
 const HOME_TAB: TabItem = { key: '/', label: i18n.t('menu:home'), closable: false }
+
+const PERSISTED_KEYS: Array<keyof PersistedAppSettings> = [
+  'darkMode', 'primaryColor', 'colorWeak', 'grayMode', 'compactMode', 'fontSize', 'borderRadius', 'sidebarDark',
+  'layoutMode', 'collapsed', 'sidebarWidth', 'showHeader', 'fixedHeader', 'showSidebar', 'fixedSidebar', 'showFooter',
+  'showBreadcrumb', 'contentWidth', 'menuAccordion', 'sideMenuType', 'contentPadding', 'headerActionVisibility',
+  'headerActionOrder', 'showHeaderUserName', 'showTabs', 'tabStyle', 'maxTabs', 'restoreTabs', 'showTabIcon',
+  'enableTransition', 'transitionName', 'motionPreference', 'animationSpeed', 'formDisplayMode', 'formColumns',
+  'formSizePreset', 'formLabelAlign', 'formComponentSize', 'formColon', 'formLayout', 'formDrawerPlacement',
+  'formLabelWidth', 'systemName', 'systemLogo', 'showWatermark', 'watermarkText', 'tableSize', 'tableBordered',
+  'tableResizable', 'tableStriped', 'tableDefaultPageSize', 'tableShowIndex', 'tableFixedHeader', 'tableMaxHeight',
+  'tableShowSizeChanger', 'tableShowQuickJumper', 'tableShowTotal', 'tablePaginationPosition',
+  'tableRememberColumnWidths', 'locale',
+]
+
+const pickPersistedSettings = (state: AppState): PersistedAppSettings => {
+  const persisted = {} as PersistedAppSettings
+  PERSISTED_KEYS.forEach((key) => Object.assign(persisted, { [key]: state[key] }))
+  if (state.restoreTabs) {
+    persisted.tabs = state.tabs
+    persisted.activeTabKey = state.activeTabKey
+  }
+  return persisted
+}
+
+const normalizeOrder = <T extends HeaderActionKey>(value: unknown, allowed: readonly T[]): T[] => {
+  if (!Array.isArray(value)) return [...allowed]
+  const unique = value.filter((key): key is T => allowed.includes(key as T)).filter((key, index, array) => array.indexOf(key) === index)
+  return [...unique, ...allowed.filter((key) => !unique.includes(key))]
+}
+
+const BOOLEAN_SETTING_KEYS: Array<keyof PersistedAppSettings> = [
+  'darkMode', 'colorWeak', 'grayMode', 'compactMode', 'sidebarDark', 'collapsed', 'showHeader', 'fixedHeader',
+  'showSidebar', 'fixedSidebar', 'showFooter', 'showBreadcrumb', 'menuAccordion', 'showHeaderUserName', 'showTabs',
+  'restoreTabs', 'showTabIcon', 'enableTransition', 'formColon', 'showWatermark', 'tableBordered', 'tableResizable',
+  'tableStriped', 'tableShowIndex', 'tableFixedHeader', 'tableShowSizeChanger', 'tableShowQuickJumper', 'tableShowTotal',
+  'tableRememberColumnWidths',
+]
+
+const STRING_SETTING_KEYS: Array<keyof PersistedAppSettings> = [
+  'primaryColor', 'systemName', 'systemLogo', 'watermarkText',
+]
+
+const NUMBER_SETTING_RANGES: Partial<Record<keyof PersistedAppSettings, readonly [number, number]>> = {
+  fontSize: [12, 20],
+  borderRadius: [0, 16],
+  sidebarWidth: [160, 320],
+  contentPadding: [0, 48],
+  maxTabs: [0, 50],
+  tableDefaultPageSize: [1, 200],
+  tableMaxHeight: [300, 1200],
+}
+
+const ENUM_SETTING_VALUES: Partial<Record<keyof PersistedAppSettings, readonly unknown[]>> = {
+  layoutMode: ['side', 'top', 'mix'],
+  contentWidth: ['fluid', 'fixed'],
+  sideMenuType: ['sub', 'group'],
+  tabStyle: ['card', 'line', 'chrome', 'rounded'],
+  transitionName: ['fade', 'slide-left', 'slide-up', 'zoom', 'none'],
+  motionPreference: ['system', 'full', 'reduced'],
+  animationSpeed: ['fast', 'standard', 'relaxed'],
+  formDisplayMode: ['modal', 'drawer'],
+  formColumns: [1, 2],
+  formSizePreset: ['small', 'medium', 'large'],
+  formLabelAlign: ['left', 'right'],
+  formComponentSize: ['small', 'middle', 'large'],
+  formLayout: ['horizontal', 'vertical'],
+  formDrawerPlacement: ['left', 'right', 'top', 'bottom'],
+  formLabelWidth: [80, 100, 120, 140],
+  tableSize: ['large', 'middle', 'small'],
+  tablePaginationPosition: ['left', 'center', 'right'],
+  locale: ['zh-CN', 'en-US', 'ja-JP'],
+}
+
+export const sanitizeAppSettings = (value: unknown): Partial<PersistedAppSettings> => {
+  const source = value && typeof value === 'object' ? value as Record<string, unknown> : {}
+  const sanitized: Partial<PersistedAppSettings> = {}
+
+  BOOLEAN_SETTING_KEYS.forEach((key) => {
+    if (typeof source[key] === 'boolean') Object.assign(sanitized, { [key]: source[key] })
+  })
+  STRING_SETTING_KEYS.forEach((key) => {
+    if (typeof source[key] === 'string') Object.assign(sanitized, { [key]: source[key] })
+  })
+  Object.entries(NUMBER_SETTING_RANGES).forEach(([key, range]) => {
+    const settingValue = source[key]
+    if (range && typeof settingValue === 'number' && Number.isFinite(settingValue) && settingValue >= range[0] && settingValue <= range[1]) {
+      Object.assign(sanitized, { [key]: settingValue })
+    }
+  })
+  Object.entries(ENUM_SETTING_VALUES).forEach(([key, allowed]) => {
+    if (allowed?.includes(source[key])) Object.assign(sanitized, { [key]: source[key] })
+  })
+
+  const visibility = source.headerActionVisibility
+  if (visibility && typeof visibility === 'object') {
+    const visibilitySource = visibility as Record<string, unknown>
+    const validVisibility = { ...DEFAULT_SETTINGS.headerActionVisibility }
+    ;(Object.keys(validVisibility) as HeaderActionKey[]).forEach((key) => {
+      if (typeof visibilitySource[key] === 'boolean') validVisibility[key] = visibilitySource[key] as boolean
+    })
+    sanitized.headerActionVisibility = validVisibility
+  }
+
+  const order = source.headerActionOrder
+  if (order && typeof order === 'object') {
+    const orderSource = order as Partial<HeaderActionOrder>
+    sanitized.headerActionOrder = {
+      primary: normalizeOrder(orderSource.primary, DEFAULT_SETTINGS.headerActionOrder.primary),
+      utility: normalizeOrder(orderSource.utility, DEFAULT_SETTINGS.headerActionOrder.utility),
+    }
+  }
+
+  if (Array.isArray(source.tabs)) {
+    sanitized.tabs = source.tabs.filter((tab): tab is TabItem => {
+      if (!tab || typeof tab !== 'object') return false
+      const candidate = tab as Record<string, unknown>
+      return typeof candidate.key === 'string' && typeof candidate.label === 'string' && typeof candidate.closable === 'boolean'
+    })
+  }
+  if (typeof source.activeTabKey === 'string') sanitized.activeTabKey = source.activeTabKey
+
+  return sanitized
+}
+
+const migrateSettings = (persistedState: unknown): PersistedAppSettings => {
+  const sanitized = sanitizeAppSettings(persistedState)
+  const merged = { ...DEFAULT_SETTINGS, ...sanitized } as AppSettings
+  merged.headerActionVisibility = sanitized.headerActionVisibility ?? { ...DEFAULT_SETTINGS.headerActionVisibility }
+  merged.headerActionOrder = sanitized.headerActionOrder ?? {
+    primary: [...DEFAULT_SETTINGS.headerActionOrder.primary],
+    utility: [...DEFAULT_SETTINGS.headerActionOrder.utility],
+  }
+  merged.isLocked = false
+  merged.lockPassword = ''
+  if (!merged.restoreTabs) {
+    merged.tabs = [HOME_TAB]
+    merged.activeTabKey = '/'
+  }
+  return pickPersistedSettings(merged as AppState)
+}
+
+export const getDefaultAppSettings = (): AppSettings => ({
+  ...DEFAULT_SETTINGS,
+  headerActionVisibility: { ...DEFAULT_SETTINGS.headerActionVisibility },
+  headerActionOrder: {
+    primary: [...DEFAULT_SETTINGS.headerActionOrder.primary],
+    utility: [...DEFAULT_SETTINGS.headerActionOrder.utility],
+  },
+  tabs: [HOME_TAB],
+})
+
+export const getPersistedAppSettings = (): PersistedAppSettings => pickPersistedSettings(useAppStore.getState())
+
+export const getAnimationDuration = (speed: AnimationSpeed): number => ({ fast: 180, standard: 300, relaxed: 450 })[speed]
+
+export const isReducedMotion = (preference: MotionPreference): boolean => {
+  if (preference === 'reduced') return true
+  if (preference === 'full') return false
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
 
 const DEFAULT_SETTINGS: AppSettings = {
   // 主题
@@ -204,16 +426,30 @@ const DEFAULT_SETTINGS: AppSettings = {
   sideMenuType: (settings.layout as { sideMenuType?: string }).sideMenuType as SideMenuType ?? 'sub',
   contentPadding: settings.layout.contentPadding,
 
+  // 顶部工具栏
+  headerActionVisibility: {
+    ...settings.header.actionVisibility,
+  },
+  headerActionOrder: {
+    primary: [...settings.header.actionOrder.primary] as HeaderActionOrder['primary'],
+    utility: [...settings.header.actionOrder.utility] as HeaderActionOrder['utility'],
+  },
+  showHeaderUserName: settings.header.showUserName,
+
   // 标签页
   showTabs: settings.tabs.showTabs,
   tabStyle: settings.tabs.tabStyle as TabStyle,
   maxTabs: settings.tabs.maxTabs,
+  restoreTabs: (settings.tabs as { restoreTabs?: boolean }).restoreTabs ?? true,
+  showTabIcon: (settings.tabs as { showTabIcon?: boolean }).showTabIcon ?? false,
   tabs: [HOME_TAB],
   activeTabKey: '/',
 
   // 动画
   enableTransition: settings.transition.enableTransition,
   transitionName: settings.transition.transitionName as PageTransition,
+  motionPreference: (settings.transition as { motionPreference?: MotionPreference }).motionPreference ?? 'system',
+  animationSpeed: (settings.transition as { animationSpeed?: AnimationSpeed }).animationSpeed ?? 'standard',
 
   // 锁屏（运行时状态，不放入配置文件）
   isLocked: false,
@@ -227,6 +463,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   formComponentSize: (settings.form as { formComponentSize?: string }).formComponentSize as FormComponentSize ?? 'middle',
   formColon: (settings.form as { formColon?: boolean }).formColon ?? true,
   formLayout: (settings.form as { formLayout?: string }).formLayout as FormLayout ?? 'horizontal',
+  formDrawerPlacement: (settings.form as { formDrawerPlacement?: FormDrawerPlacement }).formDrawerPlacement ?? 'right',
+  formLabelWidth: (settings.form as { formLabelWidth?: FormLabelWidth }).formLabelWidth ?? 100,
 
   // 系统
   systemName: settings.system.systemName,
@@ -243,6 +481,11 @@ const DEFAULT_SETTINGS: AppSettings = {
   tableShowIndex: (settings.table as any).tableShowIndex ?? false,
   tableFixedHeader: (settings.table as any).tableFixedHeader ?? false,
   tableMaxHeight: (settings.table as any).tableMaxHeight ?? 600,
+  tableShowSizeChanger: (settings.table as any).tableShowSizeChanger ?? true,
+  tableShowQuickJumper: (settings.table as any).tableShowQuickJumper ?? true,
+  tableShowTotal: (settings.table as any).tableShowTotal ?? false,
+  tablePaginationPosition: (settings.table as any).tablePaginationPosition ?? 'right',
+  tableRememberColumnWidths: (settings.table as any).tableRememberColumnWidths ?? false,
 
   // 国际化
   locale: (i18n.language || 'zh-CN') as LocaleType,
@@ -253,7 +496,7 @@ const DEFAULT_SETTINGS: AppSettings = {
  * 先截图当前画面，等 DOM 完全更新后再做整体过渡，消除黑白闪烁
  */
 function withViewTransition(callback: () => void, className?: string) {
-  if (!document.startViewTransition) {
+  if (isReducedMotion(useAppStore.getState().motionPreference) || !document.startViewTransition) {
     callback()
     return
   }
@@ -302,10 +545,25 @@ export const useAppStore = create<AppState>()(
       setSideMenuType: (sideMenuType) => set({ sideMenuType }),
       setContentPadding: (contentPadding) => set({ contentPadding }),
 
+      setHeaderActionVisible: (key, value) => set((state) => ({
+        headerActionVisibility: { ...state.headerActionVisibility, [key]: value },
+      })),
+      moveHeaderAction: (group, key, direction) => set((state) => {
+        const order = [...state.headerActionOrder[group]] as HeaderActionKey[]
+        const index = order.indexOf(key)
+        const target = index + direction
+        if (index < 0 || target < 0 || target >= order.length) return state
+        ;[order[index], order[target]] = [order[target], order[index]]
+        return { headerActionOrder: { ...state.headerActionOrder, [group]: order } as HeaderActionOrder }
+      }),
+      setShowHeaderUserName: (showHeaderUserName) => set({ showHeaderUserName }),
+
       // 标签页
       setShowTabs: (showTabs) => set({ showTabs }),
       setTabStyle: (tabStyle) => set({ tabStyle }),
       setMaxTabs: (maxTabs) => set({ maxTabs }),
+      setRestoreTabs: (restoreTabs) => set({ restoreTabs }),
+      setShowTabIcon: (showTabIcon) => set({ showTabIcon }),
       addTab: (tab) => {
         const { tabs, maxTabs } = get()
         if (!tabs.find((t) => t.key === tab.key)) {
@@ -355,6 +613,8 @@ export const useAppStore = create<AppState>()(
       // 动画
       setEnableTransition: (enableTransition) => set({ enableTransition }),
       setTransitionName: (transitionName) => set({ transitionName }),
+      setMotionPreference: (motionPreference) => set({ motionPreference }),
+      setAnimationSpeed: (animationSpeed) => set({ animationSpeed }),
 
       // 锁屏
       setIsLocked: (isLocked) => set({ isLocked }),
@@ -368,6 +628,8 @@ export const useAppStore = create<AppState>()(
       setFormComponentSize: (formComponentSize) => set({ formComponentSize }),
       setFormColon: (formColon) => set({ formColon }),
       setFormLayout: (formLayout) => set({ formLayout }),
+      setFormDrawerPlacement: (formDrawerPlacement) => set({ formDrawerPlacement }),
+      setFormLabelWidth: (formLabelWidth) => set({ formLabelWidth }),
 
       // 系统
       setSystemName: (systemName) => set({ systemName }),
@@ -384,6 +646,11 @@ export const useAppStore = create<AppState>()(
       setTableShowIndex: (tableShowIndex) => set({ tableShowIndex }),
       setTableFixedHeader: (tableFixedHeader) => set({ tableFixedHeader }),
       setTableMaxHeight: (tableMaxHeight) => set({ tableMaxHeight }),
+      setTableShowSizeChanger: (tableShowSizeChanger) => set({ tableShowSizeChanger }),
+      setTableShowQuickJumper: (tableShowQuickJumper) => set({ tableShowQuickJumper }),
+      setTableShowTotal: (tableShowTotal) => set({ tableShowTotal }),
+      setTablePaginationPosition: (tablePaginationPosition) => set({ tablePaginationPosition }),
+      setTableRememberColumnWidths: (tableRememberColumnWidths) => set({ tableRememberColumnWidths }),
 
       // 国际化
       setLocale: (locale) => {
@@ -396,6 +663,37 @@ export const useAppStore = create<AppState>()(
         dayjs.locale(dayjsLocaleMap[locale])
         localStorage.setItem('app-locale', locale)
         set({ locale })
+      },
+
+      applySettings: (nextSettings) => set((state) => ({
+        ...state,
+        ...migrateSettings({ ...pickPersistedSettings(state), ...nextSettings }),
+      })),
+      applyPreset: (preset) => {
+        if (preset === 'default') {
+          const { tabs, activeTabKey, locale, systemName, systemLogo, showWatermark, watermarkText } = get()
+          set({ ...getDefaultAppSettings(), tabs, activeTabKey, locale, systemName, systemLogo, showWatermark, watermarkText })
+        } else if (preset === 'compact') {
+          set({ compactMode: true, fontSize: 13, contentPadding: 16, tableSize: 'small', formSizePreset: 'small', animationSpeed: 'fast' })
+        } else if (preset === 'comfortable') {
+          set({ compactMode: false, fontSize: 14, contentPadding: 24, tableSize: 'large', formSizePreset: 'medium', animationSpeed: 'standard' })
+        } else if (preset === 'reducedMotion') {
+          set({ motionPreference: 'reduced', enableTransition: false })
+        }
+      },
+      resetSettingsGroup: (group) => {
+        const defaults = getDefaultAppSettings()
+        const groupValues: Record<SettingsGroup, Partial<AppSettings>> = {
+          theme: { darkMode: defaults.darkMode, primaryColor: defaults.primaryColor, colorWeak: defaults.colorWeak, grayMode: defaults.grayMode, compactMode: defaults.compactMode, fontSize: defaults.fontSize, borderRadius: defaults.borderRadius, sidebarDark: defaults.sidebarDark },
+          layout: { layoutMode: defaults.layoutMode, collapsed: defaults.collapsed, sidebarWidth: defaults.sidebarWidth, showHeader: defaults.showHeader, fixedHeader: defaults.fixedHeader, showSidebar: defaults.showSidebar, fixedSidebar: defaults.fixedSidebar, showFooter: defaults.showFooter, showBreadcrumb: defaults.showBreadcrumb, contentWidth: defaults.contentWidth, menuAccordion: defaults.menuAccordion, sideMenuType: defaults.sideMenuType, contentPadding: defaults.contentPadding },
+          header: { headerActionVisibility: { ...defaults.headerActionVisibility }, headerActionOrder: { primary: [...defaults.headerActionOrder.primary], utility: [...defaults.headerActionOrder.utility] }, showHeaderUserName: defaults.showHeaderUserName },
+          tabs: { showTabs: defaults.showTabs, tabStyle: defaults.tabStyle, maxTabs: defaults.maxTabs, restoreTabs: defaults.restoreTabs, showTabIcon: defaults.showTabIcon },
+          transition: { enableTransition: defaults.enableTransition, transitionName: defaults.transitionName, motionPreference: defaults.motionPreference, animationSpeed: defaults.animationSpeed },
+          table: { tableSize: defaults.tableSize, tableBordered: defaults.tableBordered, tableResizable: defaults.tableResizable, tableStriped: defaults.tableStriped, tableDefaultPageSize: defaults.tableDefaultPageSize, tableShowIndex: defaults.tableShowIndex, tableFixedHeader: defaults.tableFixedHeader, tableMaxHeight: defaults.tableMaxHeight, tableShowSizeChanger: defaults.tableShowSizeChanger, tableShowQuickJumper: defaults.tableShowQuickJumper, tableShowTotal: defaults.tableShowTotal, tablePaginationPosition: defaults.tablePaginationPosition, tableRememberColumnWidths: defaults.tableRememberColumnWidths },
+          form: { formDisplayMode: defaults.formDisplayMode, formColumns: defaults.formColumns, formSizePreset: defaults.formSizePreset, formLabelAlign: defaults.formLabelAlign, formComponentSize: defaults.formComponentSize, formColon: defaults.formColon, formLayout: defaults.formLayout, formDrawerPlacement: defaults.formDrawerPlacement, formLabelWidth: defaults.formLabelWidth },
+          system: { systemName: defaults.systemName, systemLogo: defaults.systemLogo, showWatermark: defaults.showWatermark, watermarkText: defaults.watermarkText, locale: defaults.locale },
+        }
+        set(groupValues[group])
       },
 
       // 通用
@@ -412,11 +710,21 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'app-settings',
-      // 自动持久化所有非函数字段，无需手动枚举，新增配置项时无需改两处
-      partialize: (state) =>
-        Object.fromEntries(
-          Object.entries(state).filter(([, v]) => typeof v !== 'function'),
-        ) as AppSettings,
+      // 仅持久化明确列出的用户偏好，运行时状态和锁屏密码不得落盘
+      version: 2,
+      partialize: pickPersistedSettings,
+      migrate: (persistedState) => migrateSettings(persistedState),
+      merge: (persistedState, currentState) => {
+        const migrated = migrateSettings(persistedState)
+        return {
+          ...currentState,
+          ...migrated,
+          tabs: migrated.restoreTabs && migrated.tabs?.length ? migrated.tabs : currentState.tabs,
+          activeTabKey: migrated.restoreTabs && migrated.activeTabKey ? migrated.activeTabKey : currentState.activeTabKey,
+          isLocked: false,
+          lockPassword: '',
+        }
+      },
       onRehydrateStorage: () => (state) => {
         if (!state) return
         const dayjsLocaleMap: Record<string, string> = {

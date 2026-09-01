@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { flushSync } from 'react-dom'
-import { Drawer, Button, Tabs, Space, message, theme, Modal } from 'antd'
-import { SettingOutlined, CopyOutlined, UndoOutlined, ClearOutlined } from '@ant-design/icons'
+import { Drawer, Button, Tabs, Space, message, theme, Modal, Input } from 'antd'
+import { SettingOutlined, CopyOutlined, UndoOutlined, ClearOutlined, ImportOutlined } from '@ant-design/icons'
 import { useTranslation } from 'react-i18next'
-import { useAppStore } from '@/stores'
+import { getPersistedAppSettings, sanitizeAppSettings, useAppStore } from '@/stores'
 import { ThemeSettings } from './ThemeSettings'
 import { LayoutSettings } from './LayoutSettings'
 import { TabsSettings } from './TabsSettings'
@@ -11,6 +11,7 @@ import { TransitionSettings } from './TransitionSettings'
 import { FormSettings } from './FormSettings'
 import { SystemSettings } from './SystemSettings'
 import { TableSettings } from './TableSettings'
+import { HeaderSettings } from './HeaderSettings'
 
 const STORAGE_KEY = 'settings-float-ball-position'
 
@@ -38,6 +39,8 @@ const getSnapPosition = (x: number, y: number) => {
 
 export const SettingsDrawer: React.FC = () => {
   const [open, setOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [importValue, setImportValue] = useState('')
 
   const [position, setPosition] = useState<{ x: number; y: number }>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -74,6 +77,8 @@ export const SettingsDrawer: React.FC = () => {
 
   const buttonRef = useRef<HTMLDivElement>(null)
   const resetSettings = useAppStore((s) => s.resetSettings)
+  const applySettings = useAppStore((s) => s.applySettings)
+  const applyPreset = useAppStore((s) => s.applyPreset)
   const { token } = theme.useToken()
   const { t } = useTranslation('settings')
 
@@ -204,66 +209,28 @@ export const SettingsDrawer: React.FC = () => {
   }
 
   const handleCopySettings = () => {
-    const state = useAppStore.getState()
-    const settingsJson = {
-      theme: {
-        darkMode: state.darkMode,
-        primaryColor: state.primaryColor,
-        colorWeak: state.colorWeak,
-        grayMode: state.grayMode,
-        compactMode: state.compactMode,
-        fontSize: state.fontSize,
-        borderRadius: state.borderRadius,
-        sidebarDark: state.sidebarDark,
-      },
-      layout: {
-        layoutMode: state.layoutMode,
-        collapsed: state.collapsed,
-        sidebarWidth: state.sidebarWidth,
-        showHeader: state.showHeader,
-        fixedHeader: state.fixedHeader,
-        showSidebar: state.showSidebar,
-        fixedSidebar: state.fixedSidebar,
-        showFooter: state.showFooter,
-        showBreadcrumb: state.showBreadcrumb,
-        contentWidth: state.contentWidth,
-        menuAccordion: state.menuAccordion,
-        contentPadding: state.contentPadding,
-      },
-      tabs: {
-        showTabs: state.showTabs,
-        tabStyle: state.tabStyle,
-        maxTabs: state.maxTabs,
-      },
-      transition: {
-        enableTransition: state.enableTransition,
-        transitionName: state.transitionName,
-      },
-      form: {
-        formDisplayMode: state.formDisplayMode,
-        formColumns: state.formColumns,
-        formSizePreset: state.formSizePreset,
-      },
-      system: {
-        systemName: state.systemName,
-        systemLogo: state.systemLogo,
-        showWatermark: state.showWatermark,
-        watermarkText: state.watermarkText,
-      },
-      table: {
-        tableSize: state.tableSize,
-        tableBordered: state.tableBordered,
-        tableResizable: state.tableResizable,
-        tableStriped: state.tableStriped,
-        tableDefaultPageSize: state.tableDefaultPageSize,
-        tableShowIndex: state.tableShowIndex,
-        tableFixedHeader: state.tableFixedHeader,
-        tableMaxHeight: state.tableMaxHeight,
-      },
-    }
+    const { tabs: _tabs, activeTabKey: _activeTabKey, ...exportedSettings } = getPersistedAppSettings()
+    const settingsJson = { schemaVersion: 2, settings: exportedSettings }
     navigator.clipboard.writeText(JSON.stringify(settingsJson, null, 2)).then(() => {
       message.success(t('copiedSuccess'))
     })
+  }
+
+  const handleImportSettings = () => {
+    try {
+      const parsed = JSON.parse(importValue) as unknown
+      const source = parsed && typeof parsed === 'object' && 'settings' in parsed
+        ? (parsed as { settings: unknown }).settings
+        : parsed
+      const sanitized = sanitizeAppSettings(source)
+      if (Object.keys(sanitized).length === 0) throw new Error('empty settings')
+      applySettings(sanitized)
+      setImportOpen(false)
+      setImportValue('')
+      message.success(t('importSuccess'))
+    } catch {
+      message.error(t('importInvalid'))
+    }
   }
 
   const handleClearCache = () => {
@@ -301,6 +268,7 @@ export const SettingsDrawer: React.FC = () => {
   const tabItems = [
     { key: 'theme', label: t('tabTheme'), children: <ThemeSettings /> },
     { key: 'layout', label: t('tabLayout'), children: <LayoutSettings /> },
+    { key: 'header', label: t('tabHeader'), children: <HeaderSettings /> },
     { key: 'tabs', label: t('tabTabs'), children: <TabsSettings /> },
     { key: 'transition', label: t('tabTransition'), children: <TransitionSettings /> },
     { key: 'table', label: t('tabTable'), children: <TableSettings /> },
@@ -351,8 +319,17 @@ export const SettingsDrawer: React.FC = () => {
         onClose={handleDrawerClose}
         footer={
           <Space style={{ width: '100%' }} direction="vertical" size={12}>
+            <Space.Compact block>
+              <Button style={{ width: '25%' }} onClick={() => applyPreset('default')}>{t('presetDefault')}</Button>
+              <Button style={{ width: '25%' }} onClick={() => applyPreset('compact')}>{t('presetCompact')}</Button>
+              <Button style={{ width: '25%' }} onClick={() => applyPreset('comfortable')}>{t('presetComfortable')}</Button>
+              <Button style={{ width: '25%' }} onClick={() => applyPreset('reducedMotion')}>{t('presetReducedMotion')}</Button>
+            </Space.Compact>
             <Button block icon={<CopyOutlined />} onClick={handleCopySettings}>
               {t('copySettings')}
+            </Button>
+            <Button block icon={<ImportOutlined />} onClick={() => setImportOpen(true)}>
+              {t('importSettings')}
             </Button>
             <Space.Compact block>
               <Button
@@ -382,6 +359,21 @@ export const SettingsDrawer: React.FC = () => {
           tabPosition="top"
         />
       </Drawer>
+      <Modal
+        title={t('importSettings')}
+        open={importOpen}
+        onCancel={() => setImportOpen(false)}
+        onOk={handleImportSettings}
+        okText={t('confirm')}
+        cancelText={t('cancel')}
+      >
+        <Input.TextArea
+          value={importValue}
+          onChange={(event) => setImportValue(event.target.value)}
+          placeholder={t('importPlaceholder')}
+          autoSize={{ minRows: 10, maxRows: 18 }}
+        />
+      </Modal>
     </>
   )
 }

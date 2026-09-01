@@ -123,5 +123,7 @@
   "loading": "加载中...",
   "newVersionAvailable": "检测到新版本，请刷新页面以获取最新功能",
   "refreshNow": "立即刷新",
-  "total": "合计"
+  "total": "合计",
+  "totalItems": "共 {{count}} 条",
+  "moreActions": "更多操作"
 }

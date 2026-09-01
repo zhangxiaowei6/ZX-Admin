@@ -1,3 +1,10 @@
 export { useUserStore } from './useUserStore'
-export { useAppStore } from './useAppStore'
+export {
+  useAppStore,
+  getAnimationDuration,
+  isReducedMotion,
+  getDefaultAppSettings,
+  getPersistedAppSettings,
+  sanitizeAppSettings,
+} from './useAppStore'
 export { useMessageStore } from './useMessageStore'

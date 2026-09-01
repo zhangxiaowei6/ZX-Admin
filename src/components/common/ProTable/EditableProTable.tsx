@@ -28,7 +28,25 @@ function EditableProTable<T extends Record<string, any>, U extends Record<string
     postData, columns, rowSelection, optionsRender, pagination, scroll,
     ...restProps
   } = props
-  const { tableSize, tableBordered, tableResizable } = useAppStore(useShallow((s) => ({ tableSize: s.tableSize, tableBordered: s.tableBordered, tableResizable: s.tableResizable })))
+  const {
+    tableSize,
+    tableBordered,
+    tableResizable,
+    tableDefaultPageSize,
+    tableShowSizeChanger,
+    tableShowQuickJumper,
+    tableShowTotal,
+    tablePaginationPosition,
+  } = useAppStore(useShallow((s) => ({
+    tableSize: s.tableSize,
+    tableBordered: s.tableBordered,
+    tableResizable: s.tableResizable,
+    tableDefaultPageSize: s.tableDefaultPageSize,
+    tableShowSizeChanger: s.tableShowSizeChanger,
+    tableShowQuickJumper: s.tableShowQuickJumper,
+    tableShowTotal: s.tableShowTotal,
+    tablePaginationPosition: s.tablePaginationPosition,
+  })))
   const { t } = useTranslation()
   const dataRef = useRef<T[]>([])
   const [exportOpen, setExportOpen] = useState(false)
@@ -76,9 +94,12 @@ function EditableProTable<T extends Record<string, any>, U extends Record<string
   const defaultPagination = pagination === false
     ? false
     : {
-        showSizeChanger: true,
-        showQuickJumper: true,
+        showSizeChanger: tableShowSizeChanger,
+        showQuickJumper: tableShowQuickJumper,
+        showTotal: tableShowTotal ? (total: number) => t('common:totalItems', { count: total }) : undefined,
+        position: (tablePaginationPosition === 'center' ? ['bottomCenter'] : tablePaginationPosition === 'left' ? ['bottomLeft'] : ['bottomRight']) as ('bottomLeft' | 'bottomCenter' | 'bottomRight')[],
         pageSizeOptions: PAGINATION.PAGE_SIZE_OPTIONS.map(String),
+        defaultPageSize: tableDefaultPageSize,
         ...(typeof pagination === 'object' ? pagination : {}),
       }
 
@@ -90,10 +111,12 @@ function EditableProTable<T extends Record<string, any>, U extends Record<string
       if (!key) return col
       const width = columnWidths[key] ?? (col as any).width
       if (!width) return col
+      const originalOnHeaderCell = (col as ProColumns<T>).onHeaderCell
       return {
         ...col,
         width,
-        onHeaderCell: () => ({
+        onHeaderCell: (column) => ({
+          ...originalOnHeaderCell?.(column),
           resizableWidth: width,
           resizable: true,
           onResizeEnd: (newWidth: number) => {

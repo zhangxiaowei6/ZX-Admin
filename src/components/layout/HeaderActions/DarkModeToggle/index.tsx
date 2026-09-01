@@ -13,7 +13,7 @@ export const DarkModeToggle: React.FC = () => {
 
   return (
     <Tooltip title={isMobile ? '' : (darkMode ? t('switchToLight') : t('switchToDark'))}>
-      <ActionIcon onClick={() => setDarkMode(!darkMode)}>
+      <ActionIcon ariaLabel={darkMode ? t('switchToLight') : t('switchToDark')} onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? <SunOutlined /> : <MoonOutlined />}
       </ActionIcon>
     </Tooltip>

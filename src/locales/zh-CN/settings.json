@@ -1,15 +1,24 @@
 {
   "drawerTitle": "项目配置",
   "copySettings": "拷贝设置",
+  "importSettings": "导入设置",
+  "importPlaceholder": "粘贴由本项目导出的配置 JSON",
+  "importSuccess": "配置导入成功",
+  "importInvalid": "配置内容无效，请检查后重试",
+  "presetDefault": "默认",
+  "presetCompact": "紧凑",
+  "presetComfortable": "舒适",
+  "presetReducedMotion": "少动效",
   "resetSettings": "重置设置",
   "clearCache": "清除缓存",
   "confirm": "确定",
   "cancel": "取消",
   "clearCacheConfirm": "清除缓存后将退出登录并刷新页面，确定要继续吗？",
   "clearCacheSuccess": "缓存已清除",
-  "copiedSuccess": "设置已复制到剪贴板，可替换 defaultSettings.json",
+  "copiedSuccess": "设置已复制到剪贴板",
   "tabTheme": "主题",
   "tabLayout": "布局",
+  "tabHeader": "顶栏",
   "tabTabs": "标签页",
   "tabTransition": "动画",
   "tabTable": "表格",
@@ -57,6 +66,8 @@
     "chrome": "谷歌",
     "rounded": "圆角",
     "tabLimit": "标签页上限",
+    "restoreTabs": "刷新后恢复标签页",
+    "showTabIcon": "显示标签页图标",
     "unlimited": "不限制",
     "count": "{{count}} 个"
   },
@@ -67,7 +78,29 @@
     "slideLeft": "左滑",
     "slideUp": "上滑",
     "zoom": "缩放",
-    "none": "无"
+    "none": "无",
+    "motionPreference": "动效偏好",
+    "system": "跟随系统",
+    "full": "完整动效",
+    "reduced": "减少动效",
+    "animationSpeed": "动画速度",
+    "fast": "快速",
+    "standard": "标准",
+    "relaxed": "舒缓"
+  },
+  "header": {
+    "menuSearch": "菜单搜索",
+    "notification": "消息通知",
+    "language": "语言切换",
+    "darkMode": "主题切换",
+    "fullscreen": "全屏",
+    "lockScreen": "锁屏",
+    "showUserName": "显示用户昵称",
+    "primaryGroup": "信息与导航",
+    "utilityGroup": "外观与系统",
+    "moveUp": "上移",
+    "moveDown": "下移",
+    "reset": "重置顶栏"
   },
   "table": {
     "tableSize": "表格大小",
@@ -81,6 +114,14 @@
     "tableDefaultPageSize": "默认每页条数",
     "tableFixedHeader": "固定表头",
     "tableMaxHeight": "表格最大高度"
+    ,"showSizeChanger": "显示每页条数切换"
+    ,"showQuickJumper": "显示快速跳页"
+    ,"showTotal": "显示总条数"
+    ,"paginationPosition": "分页位置"
+    ,"left": "左"
+    ,"center": "中"
+    ,"right": "右"
+    ,"rememberColumnWidths": "记住列宽"
   },
   "form": {
     "formDisplay": "表单展示",
@@ -100,7 +141,13 @@
     "alignLeft": "左对齐",
     "alignRight": "右对齐",
     "formComponentSize": "组件尺寸",
-    "formColon": "标签冒号"
+    "formColon": "标签冒号",
+    "drawerPlacement": "抽屉方向",
+    "labelWidth": "标签宽度",
+    "left": "左侧",
+    "right": "右侧",
+    "top": "顶部",
+    "bottom": "底部"
   },
   "system": {
     "systemName": "系统名称",

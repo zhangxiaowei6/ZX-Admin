@@ -17,10 +17,14 @@ export const TabsSettings: React.FC = () => {
     showTabs, setShowTabs,
     tabStyle, setTabStyle,
     maxTabs, setMaxTabs,
+    restoreTabs, setRestoreTabs,
+    showTabIcon, setShowTabIcon,
   } = useAppStore(useShallow((s) => ({
     showTabs: s.showTabs, setShowTabs: s.setShowTabs,
     tabStyle: s.tabStyle, setTabStyle: s.setTabStyle,
     maxTabs: s.maxTabs, setMaxTabs: s.setMaxTabs,
+    restoreTabs: s.restoreTabs, setRestoreTabs: s.setRestoreTabs,
+    showTabIcon: s.showTabIcon, setShowTabIcon: s.setShowTabIcon,
   })))
   const { t } = useTranslation('settings')
 
@@ -57,6 +61,12 @@ export const TabsSettings: React.FC = () => {
           style={{ width: 100 }}
           size="small"
         />
+      </SettingRow>
+      <SettingRow label={t('tabs.restoreTabs')}>
+        <Switch checked={restoreTabs} onChange={setRestoreTabs} disabled={!showTabs} />
+      </SettingRow>
+      <SettingRow label={t('tabs.showTabIcon')}>
+        <Switch checked={showTabIcon} onChange={setShowTabIcon} disabled={!showTabs} />
       </SettingRow>
     </>
   )

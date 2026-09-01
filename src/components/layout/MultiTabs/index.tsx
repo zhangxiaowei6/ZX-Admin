@@ -5,7 +5,12 @@ import type { MenuProps } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/stores'
 import { useShallow } from 'zustand/react/shallow'
-import { getPlatformMenuLabelByPath, getTenantMenuLabelByPath } from '@/config/routes'
+import {
+  getPlatformMenuItems,
+  getPlatformMenuLabelByPath,
+  getTenantMenuItems,
+  getTenantMenuLabelByPath,
+} from '@/config/routes'
 import './index.css'
 
 /** 判断当前路径属于哪套后台 */
@@ -30,6 +35,7 @@ export const MultiTabs: React.FC = () => {
     activeTabKey,
     showTabs,
     tabStyle,
+    showTabIcon,
     locale,
     addTab,
     removeTab,
@@ -41,6 +47,7 @@ export const MultiTabs: React.FC = () => {
     activeTabKey: s.activeTabKey,
     showTabs: s.showTabs,
     tabStyle: s.tabStyle,
+    showTabIcon: s.showTabIcon,
     locale: s.locale,
     addTab: s.addTab,
     removeTab: s.removeTab,
@@ -156,7 +163,25 @@ export const MultiTabs: React.FC = () => {
         menu={{ items: getContextMenuItems(tab.key) }}
         trigger={['contextMenu']}
       >
-        <span className="multi-tab-label">{getTabLabel(tab.key)}</span>
+        <span className="multi-tab-label">
+          {showTabIcon && (() => {
+            const items = isTenant ? getTenantMenuItems() : getPlatformMenuItems()
+            const find = (entries: typeof items): React.ReactNode => {
+              for (const item of entries) {
+                const fullPath = isTenant ? `${homePath}${item.path ? `/${item.path}` : ''}` : item.path
+                if (fullPath === tab.key) return item.icon
+                if (item.children) {
+                  const nested = find(item.children)
+                  if (nested) return nested
+                }
+              }
+              return null
+            }
+            const icon = find(items)
+            return icon ? <span style={{ marginRight: 4 }}>{icon}</span> : null
+          })()}
+          {getTabLabel(tab.key)}
+        </span>
       </Dropdown>
     ),
     closable: isClosableStyle ? tab.closable : false,

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Segmented, Switch } from 'antd'
+import { Segmented, Switch, Select } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '@/stores'
 import { useShallow } from 'zustand/react/shallow'
@@ -28,6 +28,10 @@ export const FormSettings: React.FC = () => {
     setFormColon,
     formLayout,
     setFormLayout,
+    formDrawerPlacement,
+    setFormDrawerPlacement,
+    formLabelWidth,
+    setFormLabelWidth,
   } = useAppStore(useShallow((s) => ({
     formDisplayMode: s.formDisplayMode,
     setFormDisplayMode: s.setFormDisplayMode,
@@ -43,6 +47,10 @@ export const FormSettings: React.FC = () => {
     setFormColon: s.setFormColon,
     formLayout: s.formLayout,
     setFormLayout: s.setFormLayout,
+    formDrawerPlacement: s.formDrawerPlacement,
+    setFormDrawerPlacement: s.setFormDrawerPlacement,
+    formLabelWidth: s.formLabelWidth,
+    setFormLabelWidth: s.setFormLabelWidth,
   })))
   const { t } = useTranslation('settings')
 
@@ -59,6 +67,34 @@ export const FormSettings: React.FC = () => {
           ]}
         />
       </SettingRow>
+      {formDisplayMode === 'drawer' && (
+        <>
+          <SettingRow label={t('form.drawerPlacement')}>
+            <Segmented
+              size="small"
+              value={formDrawerPlacement}
+              onChange={(value) => setFormDrawerPlacement(value as 'left' | 'right' | 'top' | 'bottom')}
+              options={[
+                { label: t('form.left'), value: 'left' },
+                { label: t('form.right'), value: 'right' },
+                { label: t('form.top'), value: 'top' },
+                { label: t('form.bottom'), value: 'bottom' },
+              ]}
+            />
+          </SettingRow>
+          {formLayout === 'horizontal' && (
+            <SettingRow label={t('form.labelWidth')}>
+              <Select
+                size="small"
+                value={formLabelWidth}
+                onChange={setFormLabelWidth}
+                style={{ width: 90 }}
+                options={[80, 100, 120, 140].map((value) => ({ label: `${value}px`, value }))}
+              />
+            </SettingRow>
+          )}
+        </>
+      )}
       <SettingRow label={t('form.formLayout')}>
         <Segmented
           size="small"

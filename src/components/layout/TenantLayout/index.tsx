@@ -9,7 +9,7 @@ import { getTenantMenuItems } from '@/config/routes'
 import type { MenuItem } from '@/config/routes'
 import { filterMenuByPermissions } from '@/services/menu.service'
 import { BaseLayout } from '../BaseLayout'
-import { MenuSearch, FullScreen, DarkModeToggle, LockScreenButton, LanguageSwitch, NotificationBell, OverflowActions, ActionDivider } from '../HeaderActions'
+import { HeaderToolbar } from '../HeaderActions'
 
 // 递归转换菜单数据为 ProLayout route 格式（带 tenantId 前缀）
 const convertMenuToRoutes = (items: MenuItem[], basePath: string): any[] =>
@@ -30,7 +30,12 @@ export const TenantLayout: React.FC = () => {
     saasName: s.saasName,
     permissions: s.permissions,
   })))
-  const { systemLogo, locale } = useAppStore(useShallow((s) => ({ systemLogo: s.systemLogo, locale: s.locale })))
+  const { systemLogo, locale, showBreadcrumb, sideMenuType } = useAppStore(useShallow((s) => ({
+    systemLogo: s.systemLogo,
+    locale: s.locale,
+    showBreadcrumb: s.showBreadcrumb,
+    sideMenuType: s.sideMenuType,
+  })))
 
   const [tenantName, setTenantName] = useState(() => {
     const nameFromUrl = searchParams.get('name')
@@ -108,21 +113,7 @@ export const TenantLayout: React.FC = () => {
     { key: 'backToPlatform', label: t('common:backToPlatform'), icon: <RollbackOutlined /> },
   ], [t])
 
-  const headerActions = useMemo(() => (
-    <OverflowActions gap={4}>
-      {/* 功能组：搜索和通知 */}
-      <MenuSearch menuItems={filteredMenuItems} basePath={basePath} />
-      <NotificationBell />
-
-      <ActionDivider />
-
-      {/* 设置组：语言、主题、全屏、锁屏 */}
-      <LanguageSwitch />
-      <DarkModeToggle />
-      <FullScreen />
-      <LockScreenButton />
-    </OverflowActions>
-  ), [basePath, filteredMenuItems])
+  const headerActions = useMemo(() => <HeaderToolbar menuItems={filteredMenuItems} basePath={basePath} />, [basePath, filteredMenuItems])
 
   const layoutTitle = saasName ? `${saasName} - ${tenantName}` : tenantName
   const watermarkContent = saasName ? `${saasName} - ${tenantName}` : tenantName
@@ -138,11 +129,13 @@ export const TenantLayout: React.FC = () => {
       onExtraMenuClick={handleExtraMenuClick}
       footerText={tenantName}
       watermarkContent={watermarkContent}
+      breadcrumbRender={showBreadcrumb ? undefined : false}
       breadcrumbProps={{
         itemRender: (route: any) => <span>{route.title}</span>,
         items: breadcrumbItems,
       }}
       menuProps={{ selectedKeys }}
+      siderMenuType={sideMenuType}
     />
   )
 }

@@ -21,16 +21,36 @@
     "showBreadcrumb": true,
     "contentWidth": "fluid",
     "menuAccordion": false,
+    "sideMenuType": "sub",
     "contentPadding": 24
+  },
+  "header": {
+    "actionVisibility": {
+      "menuSearch": true,
+      "notification": true,
+      "language": true,
+      "darkMode": true,
+      "fullscreen": false,
+      "lockScreen": true
+    },
+    "actionOrder": {
+      "primary": ["menuSearch", "notification"],
+      "utility": ["language", "darkMode", "fullscreen", "lockScreen"]
+    },
+    "showUserName": true
   },
   "tabs": {
     "showTabs": true,
     "tabStyle": "card",
-    "maxTabs": 0
+    "maxTabs": 0,
+    "restoreTabs": true,
+    "showTabIcon": false
   },
   "transition": {
     "enableTransition": true,
-    "transitionName": "fade"
+    "transitionName": "fade",
+    "motionPreference": "system",
+    "animationSpeed": "standard"
   },
   "form": {
     "formDisplayMode": "drawer",
@@ -39,7 +59,9 @@
     "formLabelAlign": "right",
     "formComponentSize": "middle",
     "formColon": true,
-    "formLayout": "vertical"
+    "formLayout": "vertical",
+    "formDrawerPlacement": "right",
+    "formLabelWidth": 100
   },
   "system": {
     "systemName": "ZX Admin",
@@ -55,6 +77,11 @@
     "tableDefaultPageSize": 20,
     "tableShowIndex": false,
     "tableFixedHeader": false,
-    "tableMaxHeight": 600
+    "tableMaxHeight": 600,
+    "tableShowSizeChanger": true,
+    "tableShowQuickJumper": true,
+    "tableShowTotal": false,
+    "tablePaginationPosition": "right",
+    "tableRememberColumnWidths": false
   }
 }

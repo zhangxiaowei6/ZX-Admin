@@ -9,7 +9,7 @@ type FormContainerProps = ModalFormProps & DrawerFormProps & {
 }
 
 export const FormContainer: React.FC<FormContainerProps> = (props) => {
-  const { formDisplayMode, formColumns, formSizePreset, formLabelAlign, formComponentSize, formColon, formLayout } = useAppStore(useShallow((s) => ({
+  const { formDisplayMode, formColumns, formSizePreset, formLabelAlign, formComponentSize, formColon, formLayout, formDrawerPlacement, formLabelWidth } = useAppStore(useShallow((s) => ({
     formDisplayMode: s.formDisplayMode,
     formColumns: s.formColumns,
     formSizePreset: s.formSizePreset,
@@ -17,21 +17,31 @@ export const FormContainer: React.FC<FormContainerProps> = (props) => {
     formComponentSize: s.formComponentSize,
     formColon: s.formColon,
     formLayout: s.formLayout,
+    formDrawerPlacement: s.formDrawerPlacement,
+    formLabelWidth: s.formLabelWidth,
   })))
 
   const isDrawer = formDisplayMode === 'drawer'
   const Form = isDrawer ? DrawerForm : ModalForm
 
   const sizeKey = props.formSize ?? formSizePreset
-  const defaultWidth = isDrawer
-    ? FORM_SIZE_MAP[sizeKey].drawer
-    : FORM_SIZE_MAP[sizeKey].modal
-
-  // 过滤掉不属于当前模式的 props
-  const { modalProps, drawerProps, formSize, ...restProps } = props
+  const { modalProps, drawerProps, formSize: ignoredFormSize, ...restProps } = props
+  void ignoredFormSize
+  const effectiveDrawerPlacement = drawerProps?.placement ?? formDrawerPlacement
+  const isVerticalDrawer = effectiveDrawerPlacement === 'top' || effectiveDrawerPlacement === 'bottom'
+  const defaultWidth = FORM_SIZE_MAP[sizeKey].modal
 
   const containerProps = isDrawer
-    ? { drawerProps: { destroyOnClose: true, width: defaultWidth, ...drawerProps } }
+    ? {
+        drawerProps: {
+          destroyOnClose: true,
+          placement: effectiveDrawerPlacement,
+          ...(isVerticalDrawer
+            ? { height: FORM_SIZE_MAP[sizeKey].drawerHeight }
+            : { width: FORM_SIZE_MAP[sizeKey].drawer }),
+          ...drawerProps,
+        },
+      }
     : { modalProps: { destroyOnClose: true, centered: true, width: defaultWidth, ...modalProps } }
 
   const gridProps = formColumns === 2
@@ -44,8 +54,8 @@ export const FormContainer: React.FC<FormContainerProps> = (props) => {
       layout: formLayout,
       labelAlign: formLabelAlign,
       ...(formLabelAlign === 'left'
-        ? { labelCol: { flex: '0 0 auto' }, wrapperCol: { flex: 1 }, labelWrap: true }
-        : { labelCol: { flex: '0 0 100px' } }),
+        ? { labelCol: props.labelCol ?? { flex: '0 0 auto' }, wrapperCol: props.wrapperCol ?? { flex: 1 }, labelWrap: true }
+        : { labelCol: props.labelCol ?? { flex: `0 0 ${formLabelWidth}px` }, wrapperCol: props.wrapperCol }),
     }
     : { layout: formLayout }
 

@@ -10,6 +10,16 @@ body {
     'Noto Color Emoji';
 }
 
+:root {
+  --app-animation-duration: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --app-animation-duration: 0ms;
+  }
+}
+
 /* 主题切换 View Transition 动画 */
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -35,7 +45,7 @@ body {
 /* 暗黑模式切换：交叉淡入淡出 */
 .dark-transition::view-transition-old(root),
 .dark-transition::view-transition-new(root) {
-  animation-duration: 0.4s;
+  animation-duration: var(--app-animation-duration);
   animation-timing-function: ease-in-out;
   animation-fill-mode: both;
 }
@@ -137,6 +147,24 @@ html.color-weak {
   background: rgba(128, 128, 128, 0.45);
 }
 
+.resizable-header-cell__handle::after {
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  left: 50%;
+  width: 2px;
+  border-radius: 1px;
+  background: transparent;
+  content: '';
+  transform: translateX(-50%);
+  transition: background-color 0.15s ease;
+}
+
+.resizable-header-cell__handle:hover::after,
+.resizable-header-cell__handle.is-resizing::after {
+  background: var(--ant-color-primary, #1677ff);
+}
+
 /* 防止 Drawer 和其他组件出现意外边框 */
 .ant-drawer,
 .ant-drawer-mask,
@@ -150,19 +178,28 @@ html.color-weak {
 
 /* 页面切换动画 */
 .page-transition-fade {
-  animation: fadeIn 300ms ease-in-out;
+  animation: fadeIn var(--app-animation-duration) ease-in-out;
 }
 
 .page-transition-slide-left {
-  animation: slideLeftIn 300ms ease-in-out;
+  animation: slideLeftIn var(--app-animation-duration) ease-in-out;
 }
 
 .page-transition-slide-up {
-  animation: slideUpIn 300ms ease-in-out;
+  animation: slideUpIn var(--app-animation-duration) ease-in-out;
 }
 
 .page-transition-zoom {
-  animation: zoomIn 300ms ease-in-out;
+  animation: zoomIn var(--app-animation-duration) ease-in-out;
+}
+
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+  scroll-behavior: auto !important;
 }
 
 @keyframes fadeIn {
