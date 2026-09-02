@@ -1,3 +1,4 @@
+import React from 'react'
 import { ModalForm, DrawerForm } from '@ant-design/pro-components'
 import type { ModalFormProps, DrawerFormProps } from '@ant-design/pro-components'
 import { useAppStore } from '@/stores'
@@ -9,7 +10,7 @@ type FormContainerProps = ModalFormProps & DrawerFormProps & {
 }
 
 export const FormContainer: React.FC<FormContainerProps> = (props) => {
-  const { formDisplayMode, formColumns, formSizePreset, formLabelAlign, formComponentSize, formColon, formLayout, formDrawerPlacement, formLabelWidth } = useAppStore(useShallow((s) => ({
+  const { formDisplayMode, formColumns, formSizePreset, formLabelAlign, formComponentSize, formColon, formLayout, formDrawerPlacement, formModalPlacement, formLabelWidth } = useAppStore(useShallow((s) => ({
     formDisplayMode: s.formDisplayMode,
     formColumns: s.formColumns,
     formSizePreset: s.formSizePreset,
@@ -18,6 +19,7 @@ export const FormContainer: React.FC<FormContainerProps> = (props) => {
     formColon: s.formColon,
     formLayout: s.formLayout,
     formDrawerPlacement: s.formDrawerPlacement,
+    formModalPlacement: s.formModalPlacement,
     formLabelWidth: s.formLabelWidth,
   })))
 
@@ -42,7 +44,15 @@ export const FormContainer: React.FC<FormContainerProps> = (props) => {
           ...drawerProps,
         },
       }
-    : { modalProps: { destroyOnClose: true, centered: true, width: defaultWidth, ...modalProps } }
+    : {
+        modalProps: {
+          destroyOnClose: true,
+          centered: formModalPlacement === 'center',
+          width: defaultWidth,
+          wrapClassName: `form-modal-position-${formModalPlacement}`,
+          ...modalProps,
+        },
+      }
 
   const gridProps = formColumns === 2
     ? { grid: true as const, colProps: { span: 12, ...props.colProps } }

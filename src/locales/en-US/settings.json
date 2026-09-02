@@ -143,11 +143,13 @@
     "formComponentSize": "Component Size",
     "formColon": "Label Colon",
     "drawerPlacement": "Drawer Placement",
+    "modalPlacement": "Modal Position",
     "labelWidth": "Label Width",
     "left": "Left",
     "right": "Right",
     "top": "Top",
-    "bottom": "Bottom"
+    "bottom": "Bottom",
+    "center": "Center"
   },
   "system": {
     "systemName": "System Name",

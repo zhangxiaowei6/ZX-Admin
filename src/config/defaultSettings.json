@@ -61,6 +61,7 @@
     "formColon": true,
     "formLayout": "vertical",
     "formDrawerPlacement": "right",
+    "formModalPlacement": "center",
     "formLabelWidth": 100
   },
   "system": {

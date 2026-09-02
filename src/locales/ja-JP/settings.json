@@ -143,11 +143,13 @@
     "formComponentSize": "コンポーネントサイズ",
     "formColon": "ラベルコロン",
     "drawerPlacement": "ドロワー位置",
+    "modalPlacement": "モーダル位置",
     "labelWidth": "ラベル幅",
     "left": "左",
     "right": "右",
     "top": "上",
-    "bottom": "下"
+    "bottom": "下",
+    "center": "中央"
   },
   "system": {
     "systemName": "システム名",

@@ -30,6 +30,8 @@ export const FormSettings: React.FC = () => {
     setFormLayout,
     formDrawerPlacement,
     setFormDrawerPlacement,
+    formModalPlacement,
+    setFormModalPlacement,
     formLabelWidth,
     setFormLabelWidth,
   } = useAppStore(useShallow((s) => ({
@@ -49,6 +51,8 @@ export const FormSettings: React.FC = () => {
     setFormLayout: s.setFormLayout,
     formDrawerPlacement: s.formDrawerPlacement,
     setFormDrawerPlacement: s.setFormDrawerPlacement,
+    formModalPlacement: s.formModalPlacement,
+    setFormModalPlacement: s.setFormModalPlacement,
     formLabelWidth: s.formLabelWidth,
     setFormLabelWidth: s.setFormLabelWidth,
   })))
@@ -94,6 +98,20 @@ export const FormSettings: React.FC = () => {
             </SettingRow>
           )}
         </>
+      )}
+      {formDisplayMode === 'modal' && (
+        <SettingRow label={t('form.modalPlacement')}>
+          <Segmented
+            size="small"
+            value={formModalPlacement}
+            onChange={(value) => setFormModalPlacement(value as 'top' | 'bottom' | 'center')}
+            options={[
+              { label: t('form.top'), value: 'top' },
+              { label: t('form.bottom'), value: 'bottom' },
+              { label: t('form.center'), value: 'center' },
+            ]}
+          />
+        </SettingRow>
       )}
       <SettingRow label={t('form.formLayout')}>
         <Segmented

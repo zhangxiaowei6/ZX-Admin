@@ -14,6 +14,30 @@ body {
   --app-animation-duration: 300ms;
 }
 
+.form-modal-position-top.ant-modal-wrap,
+.form-modal-position-bottom.ant-modal-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.form-modal-position-top.ant-modal-wrap {
+  align-items: flex-start;
+}
+
+.form-modal-position-bottom.ant-modal-wrap {
+  align-items: flex-end;
+}
+
+.form-modal-position-top.ant-modal-wrap .ant-modal {
+  top: 24px;
+  margin-bottom: 24px;
+}
+
+.form-modal-position-bottom.ant-modal-wrap .ant-modal {
+  top: auto;
+  margin-bottom: 24px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --app-animation-duration: 0ms;

@@ -54,6 +54,7 @@ const DashboardPage = () => (
 - **表单列数**：根据 `formColumns` 自动开启 grid 布局
 - **表单大小**：根据 `formSizePreset` 自动设置宽度（small/medium/large）
 - **抽屉方向**：支持 left/right/top/bottom；左右使用宽度档位，上下使用 40/60/80vh 高度档位
+- **弹窗位置**：支持 top/bottom/center
 - **destroyOnClose**：默认开启
 
 ### Props

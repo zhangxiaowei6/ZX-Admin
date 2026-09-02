@@ -24,6 +24,7 @@ export type ContentWidth = 'fluid' | 'fixed'
 export type TableSize = 'large' | 'middle' | 'small'
 export type SideMenuType = 'sub' | 'group'
 export type FormDrawerPlacement = 'left' | 'right' | 'top' | 'bottom'
+export type FormModalPlacement = 'top' | 'bottom' | 'center'
 export type FormLabelWidth = 80 | 100 | 120 | 140
 export type TablePaginationPosition = 'left' | 'center' | 'right'
 export type HeaderActionKey = 'menuSearch' | 'notification' | 'language' | 'darkMode' | 'fullscreen' | 'lockScreen'
@@ -109,6 +110,7 @@ interface AppSettings {
   formColon: boolean
   formLayout: FormLayout
   formDrawerPlacement: FormDrawerPlacement
+  formModalPlacement: FormModalPlacement
   formLabelWidth: FormLabelWidth
 
   // 系统
@@ -197,6 +199,7 @@ interface AppActions {
   setFormColon: (v: boolean) => void
   setFormLayout: (v: FormLayout) => void
   setFormDrawerPlacement: (v: FormDrawerPlacement) => void
+  setFormModalPlacement: (v: FormModalPlacement) => void
   setFormLabelWidth: (v: FormLabelWidth) => void
 
   // 系统
@@ -247,7 +250,7 @@ const PERSISTED_KEYS: Array<keyof PersistedAppSettings> = [
   'headerActionOrder', 'showHeaderUserName', 'showTabs', 'tabStyle', 'maxTabs', 'restoreTabs', 'showTabIcon',
   'enableTransition', 'transitionName', 'motionPreference', 'animationSpeed', 'formDisplayMode', 'formColumns',
   'formSizePreset', 'formLabelAlign', 'formComponentSize', 'formColon', 'formLayout', 'formDrawerPlacement',
-  'formLabelWidth', 'systemName', 'systemLogo', 'showWatermark', 'watermarkText', 'tableSize', 'tableBordered',
+  'formModalPlacement', 'formLabelWidth', 'systemName', 'systemLogo', 'showWatermark', 'watermarkText', 'tableSize', 'tableBordered',
   'tableResizable', 'tableStriped', 'tableDefaultPageSize', 'tableShowIndex', 'tableFixedHeader', 'tableMaxHeight',
   'tableShowSizeChanger', 'tableShowQuickJumper', 'tableShowTotal', 'tablePaginationPosition',
   'tableRememberColumnWidths', 'locale',
@@ -306,6 +309,7 @@ const ENUM_SETTING_VALUES: Partial<Record<keyof PersistedAppSettings, readonly u
   formComponentSize: ['small', 'middle', 'large'],
   formLayout: ['horizontal', 'vertical'],
   formDrawerPlacement: ['left', 'right', 'top', 'bottom'],
+  formModalPlacement: ['top', 'bottom', 'center'],
   formLabelWidth: [80, 100, 120, 140],
   tableSize: ['large', 'middle', 'small'],
   tablePaginationPosition: ['left', 'center', 'right'],
@@ -464,6 +468,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   formColon: (settings.form as { formColon?: boolean }).formColon ?? true,
   formLayout: (settings.form as { formLayout?: string }).formLayout as FormLayout ?? 'horizontal',
   formDrawerPlacement: (settings.form as { formDrawerPlacement?: FormDrawerPlacement }).formDrawerPlacement ?? 'right',
+  formModalPlacement: (settings.form as { formModalPlacement?: FormModalPlacement }).formModalPlacement ?? 'center',
   formLabelWidth: (settings.form as { formLabelWidth?: FormLabelWidth }).formLabelWidth ?? 100,
 
   // 系统
@@ -629,6 +634,7 @@ export const useAppStore = create<AppState>()(
       setFormColon: (formColon) => set({ formColon }),
       setFormLayout: (formLayout) => set({ formLayout }),
       setFormDrawerPlacement: (formDrawerPlacement) => set({ formDrawerPlacement }),
+      setFormModalPlacement: (formModalPlacement) => set({ formModalPlacement }),
       setFormLabelWidth: (formLabelWidth) => set({ formLabelWidth }),
 
       // 系统
@@ -690,7 +696,7 @@ export const useAppStore = create<AppState>()(
           tabs: { showTabs: defaults.showTabs, tabStyle: defaults.tabStyle, maxTabs: defaults.maxTabs, restoreTabs: defaults.restoreTabs, showTabIcon: defaults.showTabIcon },
           transition: { enableTransition: defaults.enableTransition, transitionName: defaults.transitionName, motionPreference: defaults.motionPreference, animationSpeed: defaults.animationSpeed },
           table: { tableSize: defaults.tableSize, tableBordered: defaults.tableBordered, tableResizable: defaults.tableResizable, tableStriped: defaults.tableStriped, tableDefaultPageSize: defaults.tableDefaultPageSize, tableShowIndex: defaults.tableShowIndex, tableFixedHeader: defaults.tableFixedHeader, tableMaxHeight: defaults.tableMaxHeight, tableShowSizeChanger: defaults.tableShowSizeChanger, tableShowQuickJumper: defaults.tableShowQuickJumper, tableShowTotal: defaults.tableShowTotal, tablePaginationPosition: defaults.tablePaginationPosition, tableRememberColumnWidths: defaults.tableRememberColumnWidths },
-          form: { formDisplayMode: defaults.formDisplayMode, formColumns: defaults.formColumns, formSizePreset: defaults.formSizePreset, formLabelAlign: defaults.formLabelAlign, formComponentSize: defaults.formComponentSize, formColon: defaults.formColon, formLayout: defaults.formLayout, formDrawerPlacement: defaults.formDrawerPlacement, formLabelWidth: defaults.formLabelWidth },
+          form: { formDisplayMode: defaults.formDisplayMode, formColumns: defaults.formColumns, formSizePreset: defaults.formSizePreset, formLabelAlign: defaults.formLabelAlign, formComponentSize: defaults.formComponentSize, formColon: defaults.formColon, formLayout: defaults.formLayout, formDrawerPlacement: defaults.formDrawerPlacement, formModalPlacement: defaults.formModalPlacement, formLabelWidth: defaults.formLabelWidth },
           system: { systemName: defaults.systemName, systemLogo: defaults.systemLogo, showWatermark: defaults.showWatermark, watermarkText: defaults.watermarkText, locale: defaults.locale },
         }
         set(groupValues[group])

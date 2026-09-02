@@ -143,11 +143,13 @@
     "formComponentSize": "组件尺寸",
     "formColon": "标签冒号",
     "drawerPlacement": "抽屉方向",
+    "modalPlacement": "弹窗位置",
     "labelWidth": "标签宽度",
     "left": "左侧",
     "right": "右侧",
     "top": "顶部",
-    "bottom": "底部"
+    "bottom": "底部",
+    "center": "居中"
   },
   "system": {
     "systemName": "系统名称",
