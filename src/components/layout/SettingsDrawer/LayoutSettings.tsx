@@ -72,6 +72,7 @@ export const LayoutSettings: React.FC = () => {
     menuAccordion, setMenuAccordion,
     sideMenuType, setSideMenuType,
     contentPadding, setContentPadding,
+    settingsDrawerWidth, setSettingsDrawerWidth,
   } = useAppStore(useShallow((s) => ({
     layoutMode: s.layoutMode, setLayoutMode: s.setLayoutMode,
     showHeader: s.showHeader, setShowHeader: s.setShowHeader,
@@ -85,6 +86,7 @@ export const LayoutSettings: React.FC = () => {
     menuAccordion: s.menuAccordion, setMenuAccordion: s.setMenuAccordion,
     sideMenuType: s.sideMenuType, setSideMenuType: s.setSideMenuType,
     contentPadding: s.contentPadding, setContentPadding: s.setContentPadding,
+    settingsDrawerWidth: s.settingsDrawerWidth, setSettingsDrawerWidth: s.setSettingsDrawerWidth,
   })))
   const { t } = useTranslation('settings')
   const screens = useBreakpoint()
@@ -173,6 +175,15 @@ export const LayoutSettings: React.FC = () => {
           max={48}
           value={contentPadding}
           onChange={setContentPadding}
+        />
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 8 }}>{t('layout.settingsDrawerWidth', { value: settingsDrawerWidth })}</div>
+        <Slider
+          min={320}
+          max={800}
+          value={settingsDrawerWidth}
+          onChange={setSettingsDrawerWidth}
         />
       </div>
     </>

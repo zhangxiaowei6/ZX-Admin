@@ -56,6 +56,7 @@
     "showBreadcrumb": "Show Breadcrumb",
     "sidebarWidth": "Sidebar Width: {{value}}px",
     "contentPadding": "Content Padding: {{value}}px",
+    "settingsDrawerWidth": "Settings Drawer Width: {{value}}px",
     "mobileLayoutTip": "Only mix layout is supported on mobile"
   },
   "tabs": {

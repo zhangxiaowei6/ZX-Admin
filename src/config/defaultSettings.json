@@ -22,7 +22,8 @@
     "contentWidth": "fluid",
     "menuAccordion": false,
     "sideMenuType": "sub",
-    "contentPadding": 24
+    "contentPadding": 24,
+    "settingsDrawerWidth": 550
   },
   "header": {
     "actionVisibility": {

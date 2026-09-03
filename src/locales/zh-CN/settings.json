@@ -56,6 +56,7 @@
     "showBreadcrumb": "显示面包屑",
     "sidebarWidth": "侧边栏宽度：{{value}}px",
     "contentPadding": "内容区内边距：{{value}}px",
+    "settingsDrawerWidth": "配置抽屉宽度：{{value}}px",
     "mobileLayoutTip": "移动端仅支持混合布局"
   },
   "tabs": {

@@ -56,6 +56,7 @@
     "showBreadcrumb": "パンくずリスト表示",
     "sidebarWidth": "サイドバー幅：{{value}}px",
     "contentPadding": "コンテンツ余白：{{value}}px",
+    "settingsDrawerWidth": "設定ドロワー幅：{{value}}px",
     "mobileLayoutTip": "モバイルではミックスレイアウトのみ対応しています"
   },
   "tabs": {

@@ -76,6 +76,7 @@ interface AppSettings {
   menuAccordion: boolean
   sideMenuType: SideMenuType
   contentPadding: number
+  settingsDrawerWidth: number
 
   // 顶部工具栏
   headerActionVisibility: HeaderActionVisibility
@@ -163,6 +164,7 @@ interface AppActions {
   setMenuAccordion: (v: boolean) => void
   setSideMenuType: (v: SideMenuType) => void
   setContentPadding: (v: number) => void
+  setSettingsDrawerWidth: (v: number) => void
 
   setHeaderActionVisible: (key: HeaderActionKey, value: boolean) => void
   moveHeaderAction: (group: keyof HeaderActionOrder, key: HeaderActionKey, direction: -1 | 1) => void
@@ -246,7 +248,7 @@ const HOME_TAB: TabItem = { key: '/', label: i18n.t('menu:home'), closable: fals
 const PERSISTED_KEYS: Array<keyof PersistedAppSettings> = [
   'darkMode', 'primaryColor', 'colorWeak', 'grayMode', 'compactMode', 'fontSize', 'borderRadius', 'sidebarDark',
   'layoutMode', 'collapsed', 'sidebarWidth', 'showHeader', 'fixedHeader', 'showSidebar', 'fixedSidebar', 'showFooter',
-  'showBreadcrumb', 'contentWidth', 'menuAccordion', 'sideMenuType', 'contentPadding', 'headerActionVisibility',
+  'showBreadcrumb', 'contentWidth', 'menuAccordion', 'sideMenuType', 'contentPadding', 'settingsDrawerWidth', 'headerActionVisibility',
   'headerActionOrder', 'showHeaderUserName', 'showTabs', 'tabStyle', 'maxTabs', 'restoreTabs', 'showTabIcon',
   'enableTransition', 'transitionName', 'motionPreference', 'animationSpeed', 'formDisplayMode', 'formColumns',
   'formSizePreset', 'formLabelAlign', 'formComponentSize', 'formColon', 'formLayout', 'formDrawerPlacement',
@@ -289,6 +291,7 @@ const NUMBER_SETTING_RANGES: Partial<Record<keyof PersistedAppSettings, readonly
   borderRadius: [0, 16],
   sidebarWidth: [160, 320],
   contentPadding: [0, 48],
+  settingsDrawerWidth: [320, 800],
   maxTabs: [0, 50],
   tableDefaultPageSize: [1, 200],
   tableMaxHeight: [300, 1200],
@@ -429,6 +432,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   menuAccordion: settings.layout.menuAccordion,
   sideMenuType: (settings.layout as { sideMenuType?: string }).sideMenuType as SideMenuType ?? 'sub',
   contentPadding: settings.layout.contentPadding,
+  settingsDrawerWidth: (settings.layout as { settingsDrawerWidth?: number }).settingsDrawerWidth ?? 500,
 
   // 顶部工具栏
   headerActionVisibility: {
@@ -549,6 +553,7 @@ export const useAppStore = create<AppState>()(
       setMenuAccordion: (menuAccordion) => set({ menuAccordion }),
       setSideMenuType: (sideMenuType) => set({ sideMenuType }),
       setContentPadding: (contentPadding) => set({ contentPadding }),
+      setSettingsDrawerWidth: (settingsDrawerWidth) => set({ settingsDrawerWidth }),
 
       setHeaderActionVisible: (key, value) => set((state) => ({
         headerActionVisibility: { ...state.headerActionVisibility, [key]: value },
@@ -691,7 +696,7 @@ export const useAppStore = create<AppState>()(
         const defaults = getDefaultAppSettings()
         const groupValues: Record<SettingsGroup, Partial<AppSettings>> = {
           theme: { darkMode: defaults.darkMode, primaryColor: defaults.primaryColor, colorWeak: defaults.colorWeak, grayMode: defaults.grayMode, compactMode: defaults.compactMode, fontSize: defaults.fontSize, borderRadius: defaults.borderRadius, sidebarDark: defaults.sidebarDark },
-          layout: { layoutMode: defaults.layoutMode, collapsed: defaults.collapsed, sidebarWidth: defaults.sidebarWidth, showHeader: defaults.showHeader, fixedHeader: defaults.fixedHeader, showSidebar: defaults.showSidebar, fixedSidebar: defaults.fixedSidebar, showFooter: defaults.showFooter, showBreadcrumb: defaults.showBreadcrumb, contentWidth: defaults.contentWidth, menuAccordion: defaults.menuAccordion, sideMenuType: defaults.sideMenuType, contentPadding: defaults.contentPadding },
+          layout: { layoutMode: defaults.layoutMode, collapsed: defaults.collapsed, sidebarWidth: defaults.sidebarWidth, showHeader: defaults.showHeader, fixedHeader: defaults.fixedHeader, showSidebar: defaults.showSidebar, fixedSidebar: defaults.fixedSidebar, showFooter: defaults.showFooter, showBreadcrumb: defaults.showBreadcrumb, contentWidth: defaults.contentWidth, menuAccordion: defaults.menuAccordion, sideMenuType: defaults.sideMenuType, contentPadding: defaults.contentPadding, settingsDrawerWidth: defaults.settingsDrawerWidth },
           header: { headerActionVisibility: { ...defaults.headerActionVisibility }, headerActionOrder: { primary: [...defaults.headerActionOrder.primary], utility: [...defaults.headerActionOrder.utility] }, showHeaderUserName: defaults.showHeaderUserName },
           tabs: { showTabs: defaults.showTabs, tabStyle: defaults.tabStyle, maxTabs: defaults.maxTabs, restoreTabs: defaults.restoreTabs, showTabIcon: defaults.showTabIcon },
           transition: { enableTransition: defaults.enableTransition, transitionName: defaults.transitionName, motionPreference: defaults.motionPreference, animationSpeed: defaults.animationSpeed },
