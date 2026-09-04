@@ -38,8 +38,8 @@
 **环境要求**：Node.js >= 18.0.0
 
 ```bash
-git clone https://github.com/zhangxiaowei6/ZX-Admin.git
-cd ZX-Admin
+git clone https://github.com/zhangxiaowei6/zx-admin.git
+cd zx-admin
 npm install
 cp .env.example .env.local   # 按需填入实际配置
 npm run dev

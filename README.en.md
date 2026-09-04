@@ -38,8 +38,8 @@ Multi-platform multi-tenant enterprise admin dashboard, built with React 18 + Ty
 **Requirements**: Node.js >= 18.0.0
 
 ```bash
-git clone https://github.com/zhangxiaowei6/ZX-Admin.git
-cd ZX-Admin
+git clone https://github.com/zhangxiaowei6/zx-admin.git
+cd zx-admin
 npm install
 cp .env.example .env.local   # fill in your config if needed
 npm run dev
